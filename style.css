@@ -1,0 +1,866 @@
+:root {
+    --bg: #080b12;
+    --bg-secondary: #0e131d;
+    --card: #151c28;
+    --card-hover: #1c2534;
+
+    --accent: #7c5cff;
+    --accent-light: #9b82ff;
+    --cyan: #00d4ff;
+
+    --text: #f5f7fb;
+    --text-secondary: #a4adbd;
+    --text-muted: #697386;
+
+    --border: rgba(255, 255, 255, 0.08);
+
+    --shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+
+/* ================================
+   RESET
+================================ */
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+
+    min-height: 100vh;
+
+    color: var(--text);
+
+    font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Arial,
+        sans-serif;
+
+    background:
+        radial-gradient(
+            circle at 0% 0%,
+            rgba(124, 92, 255, 0.18),
+            transparent 35%
+        ),
+
+        radial-gradient(
+            circle at 100% 0%,
+            rgba(0, 212, 255, 0.10),
+            transparent 30%
+        ),
+
+        linear-gradient(
+            180deg,
+            #080b12 0%,
+            #0a0e16 100%
+        );
+
+    padding-bottom: 120px;
+}
+
+
+/* ================================
+   HEADER
+================================ */
+
+.site-header {
+    width: min(1300px, calc(100% - 40px));
+
+    margin: 0 auto;
+
+    padding-top: 40px;
+    padding-bottom: 25px;
+}
+
+.brand {
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+}
+
+.brand-icon {
+    width: 58px;
+    height: 58px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 17px;
+
+    font-size: 27px;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--accent),
+            var(--cyan)
+        );
+
+    box-shadow:
+        0 10px 30px
+        rgba(124, 92, 255, 0.28);
+}
+
+.brand h1 {
+    margin: 0;
+
+    font-size: 29px;
+
+    font-weight: 750;
+
+    letter-spacing: -0.5px;
+}
+
+.brand p {
+    margin: 5px 0 0;
+
+    color: var(--text-muted);
+
+    font-size: 14px;
+}
+
+
+/* ================================
+   SEARCH
+================================ */
+
+.search-box {
+    position: relative;
+
+    margin-top: 28px;
+}
+
+.search-box span {
+    position: absolute;
+
+    left: 18px;
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    font-size: 18px;
+
+    pointer-events: none;
+}
+
+.search-box input {
+    width: 100%;
+
+    height: 52px;
+
+    padding:
+        0
+        18px
+        0
+        50px;
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius: 15px;
+
+    outline: none;
+
+    background:
+        rgba(255, 255, 255, 0.045);
+
+    color: var(--text);
+
+    font-size: 15px;
+
+    transition:
+        border-color 0.2s,
+        background 0.2s,
+        box-shadow 0.2s;
+}
+
+.search-box input::placeholder {
+    color: var(--text-muted);
+}
+
+.search-box input:focus {
+    border-color:
+        rgba(124, 92, 255, 0.65);
+
+    background:
+        rgba(255, 255, 255, 0.065);
+
+    box-shadow:
+        0 0 0 4px
+        rgba(124, 92, 255, 0.08);
+}
+
+
+/* ================================
+   MAIN
+================================ */
+
+#radioApp {
+    width: min(1300px, calc(100% - 40px));
+
+    margin: 0 auto;
+}
+
+
+/* ================================
+   CATEGORY
+================================ */
+
+.category {
+    margin-top: 30px;
+}
+
+.category:first-child {
+    margin-top: 5px;
+}
+
+.category-title {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    margin-bottom: 15px;
+
+    font-size: 20px;
+
+    font-weight: 700;
+}
+
+.category-title .category-count {
+    color: var(--text-muted);
+
+    font-size: 12px;
+
+    font-weight: 500;
+
+    padding:
+        3px
+        8px;
+
+    border-radius: 20px;
+
+    background:
+        rgba(255, 255, 255, 0.06);
+}
+
+
+/* ================================
+   RADIO GRID
+================================ */
+
+.radio-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fill,
+            minmax(230px, 1fr)
+        );
+
+    gap: 14px;
+}
+
+
+/* ================================
+   RADIO CARD
+================================ */
+
+.radio-card {
+    position: relative;
+
+    min-height: 145px;
+
+    padding: 18px;
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius: 18px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255, 255, 255, 0.065),
+            rgba(255, 255, 255, 0.025)
+        );
+
+    cursor: pointer;
+
+    overflow: hidden;
+
+    transition:
+        transform 0.2s ease,
+        background 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.radio-card::before {
+    content: "";
+
+    position: absolute;
+
+    width: 100px;
+    height: 100px;
+
+    top: -50px;
+    right: -50px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(124, 92, 255, 0.12);
+
+    filter: blur(5px);
+
+    pointer-events: none;
+}
+
+.radio-card:hover {
+    transform: translateY(-4px);
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(124, 92, 255, 0.13),
+            rgba(255, 255, 255, 0.035)
+        );
+
+    border-color:
+        rgba(124, 92, 255, 0.45);
+
+    box-shadow:
+        0 12px 30px
+        rgba(0, 0, 0, 0.25);
+}
+
+.radio-card.active {
+    border-color:
+        var(--accent);
+
+    box-shadow:
+        0 0 0 1px
+        rgba(124, 92, 255, 0.2),
+
+        0 12px 35px
+        rgba(124, 92, 255, 0.13);
+}
+
+
+/* ================================
+   RADIO ICON
+================================ */
+
+.radio-icon {
+    width: 47px;
+    height: 47px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    margin-bottom: 13px;
+
+    border-radius: 14px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #272f40,
+            #151b27
+        );
+
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.07);
+
+    font-size: 21px;
+}
+
+
+/* ================================
+   RADIO NAME
+================================ */
+
+.radio-name {
+    padding-right: 42px;
+
+    color: var(--text);
+
+    font-size: 15px;
+
+    font-weight: 700;
+
+    line-height: 1.35;
+}
+
+.radio-country {
+    margin-top: 5px;
+
+    color: var(--text-muted);
+
+    font-size: 12px;
+}
+
+
+/* ================================
+   PLAY BUTTON
+================================ */
+
+.radio-play {
+    position: absolute;
+
+    right: 14px;
+    bottom: 14px;
+
+    width: 38px;
+    height: 38px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+
+    border-radius: 50%;
+
+    color: white;
+
+    background:
+        var(--accent);
+
+    cursor: pointer;
+
+    font-size: 14px;
+
+    box-shadow:
+        0 5px 15px
+        rgba(124, 92, 255, 0.25);
+
+    transition:
+        transform 0.15s,
+        background 0.15s;
+}
+
+.radio-play:hover {
+    transform: scale(1.08);
+
+    background:
+        var(--accent-light);
+}
+
+
+/* ================================
+   LOADING
+================================ */
+
+.loading {
+    min-height: 300px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    color: var(--text-muted);
+}
+
+.loading-icon {
+    font-size: 35px;
+
+    margin-bottom: 12px;
+
+    animation:
+        pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 0.45;
+
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 1;
+
+        transform: scale(1.08);
+    }
+}
+
+
+/* ================================
+   EMPTY
+================================ */
+
+.empty {
+    min-height: 300px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+
+    color: var(--text-muted);
+}
+
+.empty-icon {
+    font-size: 38px;
+
+    margin-bottom: 12px;
+}
+
+
+/* ================================
+   PLAYER
+================================ */
+
+.player {
+    position: fixed;
+
+    z-index: 1000;
+
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    padding:
+        13px
+        20px;
+
+    background:
+        rgba(10, 14, 22, 0.92);
+
+    border-top:
+        1px solid
+        var(--border);
+
+    backdrop-filter:
+        blur(18px);
+
+    -webkit-backdrop-filter:
+        blur(18px);
+
+    box-shadow:
+        0 -10px 35px
+        rgba(0, 0, 0, 0.20);
+}
+
+.player-inner {
+    width: min(1300px, 100%);
+
+    margin: 0 auto;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+}
+
+
+/* ================================
+   PLAYER ICON
+================================ */
+
+.player-station-icon {
+    width: 52px;
+    height: 52px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 15px;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--accent),
+            var(--cyan)
+        );
+
+    font-size: 23px;
+
+    box-shadow:
+        0 7px 25px
+        rgba(124, 92, 255, 0.22);
+}
+
+
+/* ================================
+   PLAYER INFO
+================================ */
+
+.player-info {
+    flex: 1;
+
+    min-width: 0;
+}
+
+.player-label {
+    color: var(--text-muted);
+
+    font-size: 10px;
+
+    font-weight: 700;
+
+    letter-spacing: 1px;
+}
+
+.player-station {
+    margin-top: 3px;
+
+    color: var(--text);
+
+    font-size: 15px;
+
+    font-weight: 700;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+}
+
+.player-status {
+    margin-top: 3px;
+
+    color: var(--text-muted);
+
+    font-size: 11px;
+}
+
+
+/* ================================
+   PLAYER CONTROLS
+================================ */
+
+.player-controls {
+    display: flex;
+
+    align-items: center;
+}
+
+.play-button {
+    width: 48px;
+    height: 48px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+
+    border-radius: 50%;
+
+    color: #10131b;
+
+    background: white;
+
+    cursor: pointer;
+
+    font-size: 18px;
+
+    transition:
+        transform 0.15s,
+        background 0.15s;
+}
+
+.play-button:hover {
+    transform: scale(1.06);
+
+    background:
+        #eeeeee;
+}
+
+.play-button:active {
+    transform: scale(0.96);
+}
+
+
+/* ================================
+   VOLUME
+================================ */
+
+.volume-control {
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    color: var(--text-secondary);
+}
+
+.volume-control input {
+    width: 90px;
+
+    accent-color:
+        var(--accent);
+
+    cursor: pointer;
+}
+
+
+/* ================================
+   SCROLLBAR
+================================ */
+
+::-webkit-scrollbar {
+    width: 9px;
+}
+
+::-webkit-scrollbar-track {
+    background:
+        var(--bg);
+}
+
+::-webkit-scrollbar-thumb {
+    background:
+        #252d3a;
+
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background:
+        #343e50;
+}
+
+
+/* ================================
+   MOBILE
+================================ */
+
+@media (max-width: 700px) {
+
+    body {
+        padding-bottom: 105px;
+    }
+
+    .site-header {
+        width:
+            calc(100% - 28px);
+
+        padding-top: 25px;
+    }
+
+    #radioApp {
+        width:
+            calc(100% - 28px);
+    }
+
+    .brand-icon {
+        width: 50px;
+        height: 50px;
+
+        font-size: 23px;
+    }
+
+    .brand h1 {
+        font-size: 23px;
+    }
+
+    .brand p {
+        font-size: 12px;
+    }
+
+    .radio-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        gap: 10px;
+    }
+
+    .radio-card {
+        min-height: 135px;
+
+        padding: 14px;
+    }
+
+    .radio-name {
+        font-size: 13px;
+    }
+
+    .radio-icon {
+        width: 42px;
+        height: 42px;
+
+        margin-bottom: 10px;
+    }
+
+    .player {
+        padding:
+            10px
+            12px;
+    }
+
+    .player-inner {
+        gap: 10px;
+    }
+
+    .player-station-icon {
+        width: 44px;
+        height: 44px;
+
+        border-radius: 13px;
+
+        font-size: 19px;
+    }
+
+    .play-button {
+        width: 44px;
+        height: 44px;
+    }
+
+    .volume-control {
+        display: none;
+    }
+}
+
+
+@media (max-width: 390px) {
+
+    .radio-grid {
+        grid-template-columns:
+            1fr;
+    }
+
+    .radio-card {
+        min-height: 120px;
+    }
+}
