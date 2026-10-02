@@ -180,9 +180,6 @@ function parseM3U(text) {
     let currentRadioData =
         null;
 
-    let currentCategory =
-        "Outras";
-
     radios = [];
 
 
@@ -202,27 +199,11 @@ function parseM3U(text) {
 
 
         /*
-         * EXTGRP define exclusivamente
-         * a categoria da próxima rádio.
-         */
-
-        if (
-            line.startsWith("#EXTGRP:")
-        ) {
-
-            currentCategory =
-                line
-                    .substring(8)
-                    .trim() ||
-                "Outras";
-
-            continue;
-        }
-
-
-        /*
-         * EXTINF contém somente
-         * as informações da rádio.
+         * EXTINF contém o nome da rádio.
+         *
+         * A categoria ainda não é definida
+         * aqui porque no seu Gist o EXTGRP
+         * aparece logo depois do EXTINF.
          */
 
         if (
@@ -251,22 +232,58 @@ function parseM3U(text) {
             }
 
 
-            /*
-             * A categoria da rádio é
-             * EXCLUSIVAMENTE aquela definida
-             * pelo último #EXTGRP encontrado.
-             */
-
             currentRadioData = {
 
                 name: name,
 
                 category:
-                    currentCategory,
+                    "Outras",
+
+                displayCategory:
+                    "Outras",
 
                 url: ""
 
             };
+
+
+            continue;
+        }
+
+
+        /*
+         * EXTGRP define a categoria
+         * da rádio atual.
+         *
+         * No seu Gist ele aparece DEPOIS
+         * do EXTINF, por isso precisamos
+         * associá-lo ao currentRadioData.
+         */
+
+        if (
+            line.startsWith("#EXTGRP:")
+        ) {
+
+            if (
+                currentRadioData
+            ) {
+
+                const category =
+                    line
+                        .substring(8)
+                        .trim();
+
+
+                currentRadioData.category =
+                    category ||
+                    "Outras";
+
+
+                currentRadioData.displayCategory =
+                    category ||
+                    "Outras";
+
+            }
 
 
             continue;
@@ -287,6 +304,39 @@ function parseM3U(text) {
                 line;
 
 
+            /*
+             * Disney continua agrupada
+             * automaticamente.
+             */
+
+            if (
+                currentRadioData.name
+                    .toLowerCase()
+                    .includes("disney")
+            ) {
+
+                currentRadioData.displayCategory =
+                    "Disney";
+
+            }
+
+
+            /*
+             * Garante que nunca fique
+             * uma categoria vazia.
+             */
+
+            if (
+                !currentRadioData.displayCategory ||
+                !currentRadioData.displayCategory.trim()
+            ) {
+
+                currentRadioData.displayCategory =
+                    "Outras";
+
+            }
+
+
             radios.push(
                 currentRadioData
             );
@@ -300,6 +350,7 @@ function parseM3U(text) {
     }
 
 }
+
 
 /* ==========================================
    RENDERIZAR RÁDIOS
