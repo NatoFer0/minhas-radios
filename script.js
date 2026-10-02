@@ -83,13 +83,13 @@ const categoryIcons = {
 
     "Porto Rico": '<img src="https://flagcdn.io/flags/4x3/pr.svg" alt="Porto Rico">',
 
-    "Alemanha": '<img src="https://flagcdn.io/flags/4x3/br.svg" alt="Alemanha">',
+    "Alemanha": '<img src="https://flagcdn.io/flags/4x3/de.svg" alt="Alemanha">',
 
-    "Bolivia": '<img src="https://flagcdn.io/flags/4x3/br.svg" alt="Bolivia">',
+    "Bolivia": '<img src="https://flagcdn.io/flags/4x3/bo.svg" alt="Bolivia">',
     
-    "França": '<img src="https://flagcdn.io/flags/4x3/br.svg" alt="Franca">',
+    "França": '<img src="https://flagcdn.io/flags/4x3/fr.svg" alt="Franca">',
     
-    "Russia": '<img src="https://flagcdn.io/flags/4x3/br.svg" alt="Russia">',
+    "Russia": '<img src="https://flagcdn.io/flags/4x3/ru.svg" alt="Russia">',
 
     "Disney": "🏰",
 
