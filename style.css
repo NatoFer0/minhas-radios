@@ -1020,3 +1020,9 @@ body {
 
 }
 
+.category-flag {
+    width: 22px;
+    height: 16px;
+    object-fit: cover;
+    border-radius: 2px;
+}
