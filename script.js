@@ -1,5 +1,5 @@
 const PLAYLIST_URL =
-    "https://gist.githubusercontent.com/NatoFer0/c5174eb31972b0fddbb5e4bb460f0bc2/raw/90dcdd53e7a3fd150c8f96f21fbf4ec89db0db1f/radios.m3u";
+    "https://gist.githubusercontent.com/NatoFer0/c5174eb31972b0fddbb5e4bb460f0bc2/raw/radios.m3u";
 
 
 const audioPlayer =
