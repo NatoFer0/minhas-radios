@@ -85,7 +85,7 @@ const categoryIcons = {
 
     "Alemanha": '<img src="https://flagcdn.io/flags/4x3/de.svg" alt="Alemanha">',
 
-    "Bolivia": '<img src="https://flagcdn.io/flags/4x3/bo.svg" alt="Bolivia">',
+    "Bolívia": '<img src="https://flagcdn.io/flags/4x3/bo.svg" alt="Bolivia">',
     
     "França": '<img src="https://flagcdn.io/flags/4x3/fr.svg" alt="Franca">',
     
