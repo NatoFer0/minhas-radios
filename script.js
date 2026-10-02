@@ -45,50 +45,49 @@ let currentSort = "original";
 
 const categoryIcons = {
 
-    //ᴬ ᴮ ᶜ ᴰ ᴱ ᶠ ᴳ ᴴ ᴵ ᴶ ᴷ ᴸ ᴹ ᴺ ᴼ ᴾ ᑫ ᴿ ˢ ᵀ ᵁ ⱽ ᵂ
+    "Brasil": '<img src="https://flagcdn.io/flags/4x3/br.svg" alt="Brasil">',
 
-    "Brasil": "🇧🇷",
+    "Argentina": '<img src="https://flagcdn.io/flags/4x3/ar.svg" alt="Argentina">',
 
-    "Argentina": "🇦🇷",
+    "Uruguai": '<img src="https://flagcdn.io/flags/4x3/uy.svg" alt="Uruguai">',
 
-    "Uruguai": "🇺🇾",
+    "Uruguay": '<img src="https://flagcdn.io/flags/4x3/uy.svg" alt="Uruguay">',
 
-    "Uruguay": "🇺🇾",
+    "Chile": '<img src="https://flagcdn.io/flags/4x3/cl.svg" alt="Chile">',
 
-    "Chile": "🇨🇱",
+    "Paraguai": '<img src="https://flagcdn.io/flags/4x3/py.svg" alt="Paraguai">',
 
-    "Paraguai": "🇵🇾",
+    "Paraguay": '<img src="https://flagcdn.io/flags/4x3/py.svg" alt="Paraguay">',
 
-    "Paraguay": "🇵🇾",
+    "México": '<img src="https://flagcdn.io/flags/4x3/mx.svg" alt="México">',
 
-    "México": "🇲🇽",
+    "Mexico": '<img src="https://flagcdn.io/flags/4x3/mx.svg" alt="Mexico">',
 
-    "Mexico": "🇲🇽",
+    "Colômbia": '<img src="https://flagcdn.io/flags/4x3/co.svg" alt="Colômbia">',
 
-    "Colômbia": "🇨🇴",
+    "Colombia": '<img src="https://flagcdn.io/flags/4x3/co.svg" alt="Colombia">',
 
-    "Colombia": "🇨🇴",
+    "Peru": '<img src="https://flagcdn.io/flags/4x3/pe.svg" alt="Peru">',
 
-    "Peru": "🇵🇪",
+    "Estados Unidos": '<img src="https://flagcdn.io/flags/4x3/us.svg" alt="Estados Unidos">',
 
-    "Estados Unidos": "🇺🇸",
+    "USA": '<img src="https://flagcdn.io/flags/4x3/us.svg" alt="USA">',
 
-    "USA": "🇺🇸",
+    "Noruega": '<img src="https://flagcdn.io/flags/4x3/no.svg" alt="Noruega">',
 
-    "Noruega": "🇳🇴",
+    "República Dominicana": '<img src="https://flagcdn.io/flags/4x3/do.svg" alt="República Dominicana">',
 
-    "República Dominicana": "🇩🇴",
+    "Republica Dominicana": '<img src="https://flagcdn.io/flags/4x3/do.svg" alt="Republica Dominicana">',
 
-    "Republica Dominicana": "🇩🇴",
+    "Equador": '<img src="https://flagcdn.io/flags/4x3/ec.svg" alt="Equador">',
 
-    "Equador": "🇪🇨",
-
-    "Porto Rico": "🇵🇷",
+    "Porto Rico": '<img src="https://flagcdn.io/flags/4x3/pr.svg" alt="Porto Rico">',
 
     "Disney": "🏰",
 
     "Outras": "🌎"
 };
+
 
 
 /* ==========================================
