@@ -658,42 +658,64 @@ function createRadioCard(
    TOCAR RÁDIO
 ========================================== */
 
-async function playRadio(
-    radio
-) {
+async function playRadio(radio) {
 
     try {
 
-        currentRadio =
-            radio;
+        currentRadio = radio;
 
+        currentStation.textContent = radio.name;
 
-        currentStation.textContent =
-            radio.name;
+        playerStatus.textContent = "Conectando...";
 
-
-        playerStatus.textContent =
-            "Conectando...";
-
-
-        playPauseButton.textContent =
-            "⏳";
+        playPauseButton.textContent = "⏳";
 
 
         /*
-         * Define a URL do stream.
+         * URL original da playlist.
+         */
+        let streamUrl = radio.url;
+
+
+        /*
+         * Se for uma rádio Zeno,
+         * usamos o endereço stream.zeno.fm.
+         *
+         * Exemplo:
+         * https://stream.zeno.fm/0kp2f03143duv
          */
 
-        audioPlayer.src = radio.url;
+        if (
+            streamUrl.includes("stream.zeno.fm")
+        ) {
+
+            streamUrl =
+                streamUrl
+                    .replace(
+                        ".m3u8",
+                        ""
+                    )
+                    .replace(
+                        ".m3u",
+                        ""
+                    );
+
+        }
+
+
+        /*
+         * Define o stream no player.
+         */
+
+        audioPlayer.src = streamUrl;
 
         audioPlayer.crossOrigin = "anonymous";
 
         audioPlayer.load();
 
 
-
         /*
-         * Tenta iniciar imediatamente.
+         * Tenta iniciar.
          */
 
         await audioPlayer.play();
@@ -701,7 +723,6 @@ async function playRadio(
 
         playPauseButton.textContent =
             "⏸";
-
 
         playerStatus.textContent =
             "Ao vivo";
@@ -723,7 +744,6 @@ async function playRadio(
         playPauseButton.textContent =
             "▶";
 
-
         playerStatus.textContent =
             "Não foi possível reproduzir esta rádio no navegador.";
 
@@ -735,7 +755,6 @@ async function playRadio(
     }
 
 }
-
 
 /* ==========================================
    PLAY / PAUSE
