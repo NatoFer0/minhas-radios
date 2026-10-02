@@ -667,6 +667,9 @@ async function playRadio(
         currentRadio =
             radio;
 
+        console.log("RÁDIO SELECIONADA:", radio);
+        console.log("URL USADA PELO PLAYER:", radio.url);
+
 
         currentStation.textContent =
             radio.name;
