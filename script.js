@@ -171,6 +171,9 @@ function parseM3U(text) {
     let currentRadioData =
         null;
 
+    let currentCategory =
+        "Outras";
+
 
     radios = [];
 
@@ -191,25 +194,32 @@ function parseM3U(text) {
 
 
         /*
-         * EXTGRP define o grupo/categoria.
+         * EXTGRP define a categoria
+         * que será usada pela próxima rádio.
          */
 
         if (
             line.startsWith("#EXTGRP:")
         ) {
 
-            const category =
+            currentCategory =
                 line
                     .substring(8)
-                    .trim();
+                    .trim() ||
+                "Outras";
 
+
+            /*
+             * Se já existe uma rádio sendo
+             * montada, aplica a categoria.
+             */
 
             if (
                 currentRadioData
             ) {
 
                 currentRadioData.category =
-                    category || "Outras";
+                    currentCategory;
 
             }
 
@@ -252,7 +262,8 @@ function parseM3U(text) {
 
                 name: name,
 
-                category: "Outras",
+                category:
+                    currentCategory,
 
                 url: ""
 
@@ -290,6 +301,7 @@ function parseM3U(text) {
     }
 
 }
+
 
 
 /* ==========================================
