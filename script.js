@@ -23,6 +23,9 @@ const playPauseButton =
 const muteButton =
     document.getElementById("muteButton");
 
+const volumeControl =
+    document.getElementById("volumeControl");
+
 let previousVolume =
     Number(volumeControl.value);
 
