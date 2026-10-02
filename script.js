@@ -658,64 +658,42 @@ function createRadioCard(
    TOCAR RÁDIO
 ========================================== */
 
-async function playRadio(radio) {
+async function playRadio(
+    radio
+) {
 
     try {
 
-        currentRadio = radio;
-
-        currentStation.textContent = radio.name;
-
-        playerStatus.textContent = "Conectando...";
-
-        playPauseButton.textContent = "⏳";
+        currentRadio =
+            radio;
 
 
-        /*
-         * URL original da playlist.
-         */
-        let streamUrl = radio.url;
+        currentStation.textContent =
+            radio.name;
 
 
-        /*
-         * Se for uma rádio Zeno,
-         * usamos o endereço stream.zeno.fm.
-         *
-         * Exemplo:
-         * https://stream.zeno.fm/0kp2f03143duv
-         */
+        playerStatus.textContent =
+            "Conectando...";
 
-        if (
-            streamUrl.includes("stream.zeno.fm")
-        ) {
 
-            streamUrl =
-                streamUrl
-                    .replace(
-                        ".m3u8",
-                        ""
-                    )
-                    .replace(
-                        ".m3u",
-                        ""
-                    );
-
-        }
+        playPauseButton.textContent =
+            "⏳";
 
 
         /*
-         * Define o stream no player.
+         * Define a URL do stream.
          */
 
-        audioPlayer.src = streamUrl;
+        audioPlayer.src = radio.url;
 
         audioPlayer.crossOrigin = "anonymous";
 
         audioPlayer.load();
 
 
+
         /*
-         * Tenta iniciar.
+         * Tenta iniciar imediatamente.
          */
 
         await audioPlayer.play();
@@ -723,6 +701,7 @@ async function playRadio(radio) {
 
         playPauseButton.textContent =
             "⏸";
+
 
         playerStatus.textContent =
             "Ao vivo";
@@ -743,6 +722,7 @@ async function playRadio(radio) {
 
         playPauseButton.textContent =
             "▶";
+
 
         playerStatus.textContent =
             "Não foi possível reproduzir esta rádio no navegador.";
