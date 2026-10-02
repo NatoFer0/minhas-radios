@@ -202,8 +202,8 @@ function parseM3U(text) {
 
 
         /*
-         * EXTGRP define a categoria
-         * da próxima rádio.
+         * EXTGRP define exclusivamente
+         * a categoria da próxima rádio.
          */
 
         if (
@@ -221,7 +221,8 @@ function parseM3U(text) {
 
 
         /*
-         * EXTINF contém o nome da rádio.
+         * EXTINF contém somente
+         * as informações da rádio.
          */
 
         if (
@@ -251,39 +252,10 @@ function parseM3U(text) {
 
 
             /*
-             * Disney continua sendo
-             * agrupada automaticamente.
+             * A categoria da rádio é
+             * EXCLUSIVAMENTE aquela definida
+             * pelo último #EXTGRP encontrado.
              */
-
-            let displayCategory =
-                currentCategory;
-
-
-            if (
-                name
-                    .toLowerCase()
-                    .includes("disney")
-            ) {
-
-                displayCategory =
-                    "Disney";
-
-            }
-
-
-            /*
-             * Caso a categoria esteja vazia.
-             */
-
-            if (
-                !displayCategory.trim()
-            ) {
-
-                displayCategory =
-                    "Outras";
-
-            }
-
 
             currentRadioData = {
 
@@ -291,9 +263,6 @@ function parseM3U(text) {
 
                 category:
                     currentCategory,
-
-                displayCategory:
-                    displayCategory,
 
                 url: ""
 
