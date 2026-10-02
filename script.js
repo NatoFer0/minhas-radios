@@ -20,8 +20,11 @@ const playerStatus =
 const playPauseButton =
     document.getElementById("playPauseButton");
 
-const volumeControl =
-    document.getElementById("volumeControl");
+const muteButton =
+    document.getElementById("muteButton");
+
+let previousVolume =
+    Number(volumeControl.value);
 
 
 let radios = [];
@@ -835,10 +838,111 @@ volumeControl.addEventListener(
     "input",
     () => {
 
+        const volume =
+            Number(volumeControl.value);
+
         audioPlayer.volume =
-            Number(
-                volumeControl.value
+            volume;
+
+
+        if (volume > 0) {
+
+            previousVolume =
+                volume;
+
+            muteButton.textContent =
+                "🔊";
+
+            muteButton.setAttribute(
+                "aria-label",
+                "Mutar"
             );
+
+            muteButton.setAttribute(
+                "title",
+                "Mutar"
+            );
+
+        } else {
+
+            muteButton.textContent =
+                "🔇";
+
+            muteButton.setAttribute(
+                "aria-label",
+                "Ativar som"
+            );
+
+            muteButton.setAttribute(
+                "title",
+                "Ativar som"
+            );
+
+        }
+
+    }
+);
+
+
+/* ==========================================
+   MUTAR / DESMUTAR
+========================================== */
+
+muteButton.addEventListener(
+    "click",
+    () => {
+
+        if (audioPlayer.volume > 0) {
+
+            previousVolume =
+                audioPlayer.volume;
+
+            audioPlayer.volume =
+                0;
+
+            volumeControl.value =
+                0;
+
+            muteButton.textContent =
+                "🔇";
+
+            muteButton.setAttribute(
+                "aria-label",
+                "Ativar som"
+            );
+
+            muteButton.setAttribute(
+                "title",
+                "Ativar som"
+            );
+
+        } else {
+
+            const volume =
+                previousVolume > 0
+                    ? previousVolume
+                    : 0.8;
+
+            audioPlayer.volume =
+                volume;
+
+            volumeControl.value =
+                volume;
+
+            muteButton.textContent =
+                "🔊";
+
+            muteButton.setAttribute(
+                "aria-label",
+                "Mutar"
+            );
+
+            muteButton.setAttribute(
+                "title",
+                "Mutar"
+            );
+
+        }
 
     }
 );
