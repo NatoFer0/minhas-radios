@@ -37,12 +37,15 @@ let radios = [];
 
 let currentRadio = null;
 
+let currentSort = "original";
 
 /* ==========================================
    ÍCONES DAS CATEGORIAS
 ========================================== */
 
 const categoryIcons = {
+
+    //ᴬ ᴮ ᶜ ᴰ ᴱ ᶠ ᴳ ᴴ ᴵ ᴶ ᴷ ᴸ ᴹ ᴺ ᴼ ᴾ ᑫ ᴿ ˢ ᵀ ᵁ ⱽ ᵂ
 
     "Brasil": "🇧🇷",
 
@@ -77,6 +80,8 @@ const categoryIcons = {
     "República Dominicana": "🇩🇴",
 
     "Republica Dominicana": "🇩🇴",
+
+    "Equador": "🇪🇨",
 
     "Porto Rico": "🇵🇷",
 
@@ -137,15 +142,16 @@ async function loadPlaylist() {
 
 
         if (!radios.length) {
-
+        
             throw new Error(
                 "Nenhuma rádio encontrada."
             );
-
+        
         }
-
-
+        
+        
         renderRadios();
+
 
 
     } catch (error) {
@@ -177,7 +183,6 @@ function parseM3U(text) {
     let currentCategory =
         "Outras";
 
-
     radios = [];
 
 
@@ -198,7 +203,7 @@ function parseM3U(text) {
 
         /*
          * EXTGRP define a categoria
-         * que será usada pela próxima rádio.
+         * da próxima rádio.
          */
 
         if (
@@ -210,22 +215,6 @@ function parseM3U(text) {
                     .substring(8)
                     .trim() ||
                 "Outras";
-
-
-            /*
-             * Se já existe uma rádio sendo
-             * montada, aplica a categoria.
-             */
-
-            if (
-                currentRadioData
-            ) {
-
-                currentRadioData.category =
-                    currentCategory;
-
-            }
-
 
             continue;
         }
@@ -261,12 +250,50 @@ function parseM3U(text) {
             }
 
 
+            /*
+             * Disney continua sendo
+             * agrupada automaticamente.
+             */
+
+            let displayCategory =
+                currentCategory;
+
+
+            if (
+                name
+                    .toLowerCase()
+                    .includes("disney")
+            ) {
+
+                displayCategory =
+                    "Disney";
+
+            }
+
+
+            /*
+             * Caso a categoria esteja vazia.
+             */
+
+            if (
+                !displayCategory.trim()
+            ) {
+
+                displayCategory =
+                    "Outras";
+
+            }
+
+
             currentRadioData = {
 
                 name: name,
 
                 category:
                     currentCategory,
+
+                displayCategory:
+                    displayCategory,
 
                 url: ""
 
@@ -278,8 +305,8 @@ function parseM3U(text) {
 
 
         /*
-         * A linha seguinte ao EXTINF
-         * normalmente é a URL.
+         * Qualquer linha que não comece
+         * com "#" será tratada como URL.
          */
 
         if (
@@ -304,81 +331,6 @@ function parseM3U(text) {
     }
 
 }
-
-
-
-/* ==========================================
-   ORGANIZAR CATEGORIAS
-========================================== */
-
-function organizeCategories() {
-
-    const categories = {};
-
-
-    radios.forEach(
-        radio => {
-
-            let category =
-                radio.category ||
-                "Outras";
-
-
-            /*
-             * Todas as rádios Disney
-             * ficam juntas na categoria Disney.
-             */
-
-            if (
-                radio.name
-                    .toLowerCase()
-                    .includes("disney")
-            ) {
-
-                category =
-                    "Disney";
-
-            }
-
-
-            /*
-             * Caso a categoria esteja vazia.
-             */
-
-            if (!category.trim()) {
-
-                category =
-                    "Outras";
-
-            }
-
-
-            radio.displayCategory =
-                category;
-
-
-            if (
-                !categories[category]
-            ) {
-
-                categories[category] =
-                    [];
-
-            }
-
-
-            categories[category].push(
-                radio
-            );
-
-        }
-    );
-
-
-    return categories;
-
-}
-
 
 /* ==========================================
    RENDERIZAR RÁDIOS
@@ -475,14 +427,54 @@ function renderRadios(
     radioApp.innerHTML = "";
 
 
-    Object.entries(categories)
-        .forEach(
-            (
-                [
-                    category,
-                    categoryRadios
-                ]
-            ) => {
+    let categoryEntries =
+    Object.entries(categories);
+
+
+/*
+ * Mantém a ordem original
+ * quando essa opção estiver selecionada.
+ */
+
+if (currentSort === "az") {
+
+    categoryEntries.sort(
+        (a, b) =>
+            a[0].localeCompare(
+                b[0],
+                "pt-BR",
+                {
+                    sensitivity: "base"
+                }
+            )
+    );
+
+}
+
+
+if (currentSort === "za") {
+
+    categoryEntries.sort(
+        (a, b) =>
+            b[0].localeCompare(
+                a[0],
+                "pt-BR",
+                {
+                    sensitivity: "base"
+                }
+            )
+    );
+
+}
+
+
+categoryEntries.forEach(
+    (
+        [
+            category,
+            categoryRadios
+        ]
+    ) => {
 
                 const section =
                     document.createElement(
