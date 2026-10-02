@@ -11,6 +11,9 @@ const radioApp =
 const searchInput =
     document.getElementById("searchInput");
 
+const sortSelect =
+    document.getElementById("sortSelect");
+
 const currentStation =
     document.getElementById("currentStation");
 
