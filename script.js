@@ -43,35 +43,53 @@ let currentSort = "original";
    ÍCONES DAS CATEGORIAS
 ========================================== */
 
-function getCountryCode(category) {
+const categoryIcons = {
 
-    const countries = {
+    //ᴬ ᴮ ᶜ ᴰ ᴱ ᶠ ᴳ ᴴ ᴵ ᴶ ᴷ ᴸ ᴹ ᴺ ᴼ ᴾ ᑫ ᴿ ˢ ᵀ ᵁ ⱽ ᵂ
 
-        "Brasil": "br",
-        "Argentina": "ar",
-        "Chile": "cl",
-        "Equador": "ec",
-        "Peru": "pe",
-        "Colombia": "co",
-        "Colômbia": "co",
-        "Mexico": "mx",
-        "México": "mx",
-        "Alemanha": "de",
-        "Noruega": "no",
-        "Porto Rico": "pr",
-        "Estados Unidos": "us",
-        "Republica Dominicana": "do",
-        "República Dominicana": "do",
-        "Paraguai": "py",
-        "Paraguay": "py",
-        "Uruguai": "uy",
-        "Uruguay": "uy"
+    "Brasil": "🇧🇷",
 
-    };
+    "Argentina": "🇦🇷",
 
-    return countries[category] || null;
+    "Uruguai": "🇺🇾",
 
-}
+    "Uruguay": "🇺🇾",
+
+    "Chile": "🇨🇱",
+
+    "Paraguai": "🇵🇾",
+
+    "Paraguay": "🇵🇾",
+
+    "México": "🇲🇽",
+
+    "Mexico": "🇲🇽",
+
+    "Colômbia": "🇨🇴",
+
+    "Colombia": "🇨🇴",
+
+    "Peru": "🇵🇪",
+
+    "Estados Unidos": "🇺🇸",
+
+    "USA": "🇺🇸",
+
+    "Noruega": "🇳🇴",
+
+    "República Dominicana": "🇩🇴",
+
+    "Republica Dominicana": "🇩🇴",
+
+    "Equador": "🇪🇨",
+
+    "Porto Rico": "🇵🇷",
+
+    "Disney": "🏰",
+
+    "Outras": "🌎"
+};
+
 
 /* ==========================================
    INICIALIZAÇÃO
@@ -490,18 +508,10 @@ categoryEntries.forEach(
                     "category";
 
 
-                const countryCode =
-                    getCountryCode(category);
-                
                 const icon =
-                    countryCode
-                        ? `<img
-                            src="URL_DA_BANDEIRA/${countryCode}.svg"
-                            alt=""
-                            class="category-flag"
-                          >`
-                        : "🌎";
-
+                    categoryIcons[
+                        category
+                    ] || "🌎";
 
 
                 section.innerHTML = `
