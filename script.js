@@ -432,8 +432,10 @@ function renderRadios(
 
 
 /*
- * Mantém a ordem original
- * quando essa opção estiver selecionada.
+ * Ordenação das categorias.
+ *
+ * "original" mantém a ordem em que
+ * as categorias apareceram no arquivo M3U.
  */
 
 if (currentSort === "az") {
@@ -972,6 +974,25 @@ searchInput.addEventListener(
 
     }
 );
+
+/* ==========================================
+   ORDENAÇÃO
+========================================== */
+
+sortSelect.addEventListener(
+    "change",
+    () => {
+
+        currentSort =
+            sortSelect.value;
+
+        renderRadios(
+            searchInput.value
+        );
+
+    }
+);
+
 
 
 /* ==========================================
