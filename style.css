@@ -866,19 +866,51 @@ body {
 }
 
 #muteButton {
-    background: none;
-    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 36px;
+    height: 36px;
+
     padding: 0;
     margin: 0;
-    color: inherit;
-    font-size: 18px;
+
+    border: none;
+    outline: none;
+
+    background: transparent !important;
+
+    color: var(--text-secondary);
+
+    font-size: 20px;
     line-height: 1;
+
     cursor: pointer;
+
     appearance: none;
+    -webkit-appearance: none;
+
+    box-shadow: none !important;
+
+    border-radius: 50%;
+
+    transition:
+        color 0.15s ease,
+        background 0.15s ease,
+        transform 0.15s ease;
 }
 
 #muteButton:hover {
-    background: none;
-    transform: none;
+    color: var(--text);
+    background: rgba(255, 255, 255, 0.06) !important;
 }
 
+#muteButton:active {
+    transform: scale(0.9);
+}
+
+#muteButton:focus {
+    outline: none;
+    box-shadow: none !important;
+}
