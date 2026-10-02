@@ -667,6 +667,7 @@ async function playRadio(
         currentRadio =
             radio;
 
+
         currentStation.textContent =
             radio.name;
 
@@ -683,12 +684,11 @@ async function playRadio(
          * Define a URL do stream.
          */
 
-        audioPlayer.src = radio.url;
+        audioPlayer.src =
+            radio.url;
 
-        audioPlayer.crossOrigin = "anonymous";
 
         audioPlayer.load();
-
 
 
         /*
@@ -734,6 +734,7 @@ async function playRadio(
     }
 
 }
+
 
 /* ==========================================
    PLAY / PAUSE
