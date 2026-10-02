@@ -1020,9 +1020,10 @@ body {
 
 }
 
-.category-flag {
+.category-title img {
     width: 22px;
     height: 16px;
     object-fit: cover;
-    border-radius: 2px;
+    display: inline-block;
+    vertical-align: middle;
 }
