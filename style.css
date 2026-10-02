@@ -967,6 +967,9 @@ body {
 
     cursor: pointer;
 
+    appearance: none;
+    -webkit-appearance: none;
+
     transition:
         border-color 0.2s,
         background 0.2s,
