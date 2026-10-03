@@ -1241,3 +1241,319 @@ body {
     text-align: right;
 }
 
+/* ================================
+   BARRA DE FERRAMENTAS
+================================ */
+
+.toolbar {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: flex-end;
+
+    gap: 18px;
+
+    margin-top: 12px;
+}
+
+
+/* ================================
+   OUVIDAS RECENTEMENTE
+================================ */
+
+.recent-box {
+    position: relative;
+}
+
+
+.recent-button {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    height: 38px;
+
+    padding:
+        0
+        12px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    color: var(--text-muted);
+
+    background:
+        transparent;
+
+    font-family: inherit;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        color 0.2s ease,
+        background 0.2s ease;
+}
+
+
+.recent-button:hover {
+    color: var(--text);
+
+    background:
+        rgba(255, 255, 255, 0.06);
+}
+
+
+.recent-button:focus {
+    outline: none;
+}
+
+
+.recent-button[aria-expanded="true"] {
+    color: var(--text);
+
+    background:
+        rgba(124, 92, 255, 0.10);
+}
+
+
+/* ================================
+   DROPDOWN
+================================ */
+
+.recent-dropdown {
+    position: absolute;
+
+    top: calc(100% + 8px);
+
+    right: 0;
+
+    width: 280px;
+
+    padding: 8px;
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius: 14px;
+
+    background:
+        rgba(14, 19, 29, 0.97);
+
+    box-shadow:
+        0 15px 40px
+        rgba(0, 0, 0, 0.35);
+
+    backdrop-filter:
+        blur(18px);
+
+    -webkit-backdrop-filter:
+        blur(18px);
+
+    opacity: 0;
+
+    visibility: hidden;
+
+    transform:
+        translateY(-5px);
+
+    pointer-events: none;
+
+    transition:
+        opacity 0.18s ease,
+        transform 0.18s ease,
+        visibility 0.18s ease;
+
+    z-index: 100;
+}
+
+
+.recent-dropdown.open {
+    opacity: 1;
+
+    visibility: visible;
+
+    transform:
+        translateY(0);
+
+    pointer-events: auto;
+}
+
+
+/* ================================
+   ITEM RECENTE
+================================ */
+
+.recent-item {
+    width: 100%;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    padding:
+        10px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    color: var(--text);
+
+    background:
+        transparent;
+
+    font-family: inherit;
+
+    text-align: left;
+
+    cursor: pointer;
+
+    transition:
+        background 0.15s ease;
+}
+
+
+.recent-item:hover {
+    background:
+        rgba(255, 255, 255, 0.06);
+}
+
+
+.recent-item-icon {
+    width: 34px;
+    height: 34px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 9px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #272f40,
+            #151b27
+        );
+
+    font-size: 15px;
+}
+
+
+.recent-item-info {
+    min-width: 0;
+
+    flex: 1;
+}
+
+
+.recent-item-name {
+    overflow: hidden;
+
+    color: var(--text);
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    white-space: nowrap;
+
+    text-overflow: ellipsis;
+}
+
+
+.recent-item-category {
+    margin-top: 2px;
+
+    overflow: hidden;
+
+    color: var(--text-muted);
+
+    font-size: 10px;
+
+    white-space: nowrap;
+
+    text-overflow: ellipsis;
+}
+
+
+.recent-item-play {
+    color: var(--text-muted);
+
+    font-size: 13px;
+
+    transition:
+        color 0.15s ease,
+        transform 0.15s ease;
+}
+
+
+.recent-item:hover .recent-item-play {
+    color: var(--accent-light);
+
+    transform: scale(1.1);
+}
+
+
+/* ================================
+   SEM HISTÓRICO
+================================ */
+
+.recent-empty {
+    padding:
+        20px
+        12px;
+
+    color: var(--text-muted);
+
+    font-size: 12px;
+
+    text-align: center;
+}
+
+
+/* ================================
+   MOBILE
+================================ */
+
+@media (max-width: 700px) {
+
+    .toolbar {
+        justify-content: space-between;
+
+        gap: 10px;
+    }
+
+    .recent-button {
+        padding:
+            0
+            9px;
+    }
+
+    .recent-dropdown {
+        left: 0;
+        right: auto;
+
+        width: min(
+            280px,
+            calc(100vw - 28px)
+        );
+    }
+
+}
+
+
