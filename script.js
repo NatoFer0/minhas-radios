@@ -1060,13 +1060,9 @@ playPauseButton.addEventListener(
             audioPlayer.pause();
 
             /*
-             * Remove completamente a conexão
-             * com o stream atual.
-             *
-             * Isso impede que o navegador
-             * continue mantendo o ponto anterior
-             * da transmissão.
-             */
+            * Remove completamente a conexão
+            * com o stream atual.
+            */
 
             audioPlayer.removeAttribute(
                 "src"
@@ -1074,21 +1070,27 @@ playPauseButton.addEventListener(
 
             audioPlayer.load();
 
+            /*
+            * Limpa a rádio atualmente selecionada.
+            */
 
+            currentRadio = null;
+
+            currentStation.textContent =
+                "Nenhuma rádio selecionada";
+            
             playPauseButton.textContent =
                 "▶";
-
-
+            
             playerStatus.textContent =
-                "Parado";
-
-
+                "Escolha uma rádio para começar.";
+            
             renderRadios(
                 searchInput.value
             );
-
-
+            
             return;
+
 
         }
 
@@ -1331,29 +1333,6 @@ audioPlayer.addEventListener(
 
     }
 );
-
-
-audioPlayer.addEventListener(
-    "pause",
-    () => {
-
-        /*
-         * Não sobrescreve o estado
-         * enquanto estiver carregando.
-         */
-
-        if (
-            audioPlayer.src
-        ) {
-
-            playPauseButton.textContent =
-                "▶";
-
-        }
-
-    }
-);
-
 
 audioPlayer.addEventListener(
     "waiting",
