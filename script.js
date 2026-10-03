@@ -91,12 +91,18 @@ const categoryIcons = {
     
     "Russia": '<img src="https://flagcdn.io/flags/4x3/ru.svg" alt="Russia">',
 
+    "Paquistão": '<img src="https://flagcdn.io/flags/4x3/pk.svg" alt="Paquistao">',
+    
+    "Turquia": '<img src="https://flagcdn.io/flags/4x3/tr.svg" alt="Turquia">',
+
+    "Espanha": '<img src="https://flagcdn.io/flags/4x3/es.svg" alt="Espanha">',
+
+    "Itália": '<img src="https://flagcdn.io/flags/4x3/es.svg" alt="Italia">',
+
     "Disney": "🏰",
 
     "Outras": "🌎"
 };
-
-
 
 /* ==========================================
    INICIALIZAÇÃO
