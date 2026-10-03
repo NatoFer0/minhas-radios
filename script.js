@@ -29,6 +29,12 @@ const muteButton =
 const volumeControl =
     document.getElementById("volumeControl");
 
+const recentButton =
+    document.getElementById("recentButton");
+
+const recentDropdown =
+    document.getElementById("recentDropdown");
+
 const volumeValue =
     document.getElementById("volumeValue");
 
@@ -1400,6 +1406,80 @@ muteButton.addEventListener(
             muteButton.setAttribute(
                 "title",
                 "Mutar"
+            );
+
+        }
+
+    }
+);
+
+/* ==========================================
+   OUVIDAS RECENTEMENTE
+========================================== */
+
+recentButton.addEventListener(
+    "click",
+    event => {
+
+        event.stopPropagation();
+
+        const isOpen =
+            recentDropdown.classList.contains(
+                "open"
+            );
+
+
+        if (isOpen) {
+
+            recentDropdown.classList.remove(
+                "open"
+            );
+
+            recentButton.setAttribute(
+                "aria-expanded",
+                "false"
+            );
+
+            return;
+
+        }
+
+
+        recentDropdown.classList.add(
+            "open"
+        );
+
+        recentButton.setAttribute(
+            "aria-expanded",
+            "true"
+        );
+
+    }
+);
+
+
+/*
+ * Fecha o dropdown quando o usuário
+ * clicar fora dele.
+ */
+
+document.addEventListener(
+    "click",
+    event => {
+
+        if (
+            !event.target.closest(
+                ".recent-box"
+            )
+        ) {
+
+            recentDropdown.classList.remove(
+                "open"
+            );
+
+            recentButton.setAttribute(
+                "aria-expanded",
+                "false"
             );
 
         }
