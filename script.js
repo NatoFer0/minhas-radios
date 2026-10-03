@@ -1,7 +1,6 @@
 const PLAYLIST_URL =
     "https://gist.githubusercontent.com/NatoFer0/c5174eb31972b0fddbb5e4bb460f0bc2/raw/radios.m3u";
 
-
 const audioPlayer =
     document.getElementById("audioPlayer");
 
@@ -34,6 +33,16 @@ const recentButton =
 
 const recentDropdown =
     document.getElementById("recentDropdown");
+
+const RECENT_STORAGE_KEY =
+    "minhasRadios_ouvidasRecentemente";
+
+let recentRadios =
+    JSON.parse(
+        localStorage.getItem(
+            RECENT_STORAGE_KEY
+        ) || "[]"
+    );
 
 const volumeValue =
     document.getElementById("volumeValue");
@@ -187,13 +196,12 @@ document.addEventListener(
 
         }
 
+        renderRecentDropdown();
 
         loadPlaylist();
 
     }
 );
-
-
 
 /* ==========================================
    CARREGAR PLAYLIST
@@ -505,6 +513,159 @@ function toggleFavorite(radio) {
 
     renderRadios(
         searchInput.value
+    );
+
+}
+
+/* ==========================================
+   REGISTRAR RÁDIO COMO OUVIDA RECENTEMENTE
+========================================== */
+
+function addToRecent(radio) {
+
+    /*
+     * Remove a rádio caso ela já esteja
+     * na lista.
+     */
+
+    recentRadios =
+        recentRadios.filter(
+            item =>
+                item.url !== radio.url
+        );
+
+
+    /*
+     * Coloca a rádio atual no início
+     * da lista.
+     */
+
+    recentRadios.unshift({
+        name: radio.name,
+        url: radio.url
+    });
+
+
+    /*
+     * Mantém somente as 5 últimas.
+     */
+
+    recentRadios =
+        recentRadios.slice(0, 5);
+
+
+    /*
+     * Salva no navegador.
+     */
+
+    localStorage.setItem(
+        RECENT_STORAGE_KEY,
+        JSON.stringify(recentRadios)
+    );
+
+
+    renderRecentDropdown();
+
+}
+
+/* ==========================================
+   RENDERIZAR OUVIDAS RECENTEMENTE
+========================================== */
+
+function renderRecentDropdown() {
+
+    recentDropdown.innerHTML = "";
+
+
+    if (!recentRadios.length) {
+
+        recentDropdown.innerHTML = `
+            <div class="recent-empty">
+                Nenhuma rádio ouvida recentemente.
+            </div>
+        `;
+
+        return;
+
+    }
+
+
+    recentRadios.forEach(
+        radio => {
+
+            const item =
+                document.createElement(
+                    "button"
+                );
+
+
+            item.type =
+                "button";
+
+
+            item.className =
+                "recent-item";
+
+
+            item.textContent =
+                radio.name;
+
+
+            item.title =
+                "Tocar " + radio.name;
+
+
+            item.addEventListener(
+                "click",
+                event => {
+
+                    event.stopPropagation();
+
+
+                    /*
+                     * Procura a rádio atual
+                     * dentro da playlist.
+                     */
+
+                    const foundRadio =
+                        radios.find(
+                            item =>
+                                item.url === radio.url
+                        );
+
+
+                    if (foundRadio) {
+
+                        playRadio(
+                            foundRadio
+                        );
+
+                    }
+
+
+                    /*
+                     * Fecha o dropdown.
+                     */
+
+                    recentDropdown.classList.remove(
+                        "open"
+                    );
+
+
+                    recentButton.setAttribute(
+                        "aria-expanded",
+                        "false"
+                    );
+
+                }
+            );
+
+
+            recentDropdown.appendChild(
+                item
+            );
+
+        }
     );
 
 }
@@ -1091,7 +1252,10 @@ async function playRadio(
 
         await audioPlayer.play();
 
-
+        addToRecent(
+            radio
+        );
+        
         playPauseButton.textContent =
             "⏹";
 
