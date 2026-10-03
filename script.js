@@ -1053,7 +1053,7 @@ async function playRadio(
 
 
         playerStatus.innerHTML = `
-            <span class="radio-live">
+            <span class="player-live">
                 <span class="radio-live-dot"></span>
                 AO VIVO
             </span>
@@ -1389,7 +1389,7 @@ audioPlayer.addEventListener(
 
 
         playerStatus.innerHTML = `
-            <span class="radio-live">
+            <span class="player-live">
                 <span class="radio-live-dot"></span>
                 AO VIVO
             </span>
