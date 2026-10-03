@@ -118,6 +118,8 @@ const categoryIcons = {
 
     "Itália": '<img src="https://flagcdn.io/flags/4x3/it.svg" alt="Italia">',
 
+    "Suiça": '<img src="https://flagcdn.io/flags/4x3/ch.svg" alt="Suica">',
+
     "Disney": "🏰",
 
     "Outras": "🌎"
