@@ -1035,11 +1035,11 @@ body {
 .radio-favorite {
     position: absolute;
 
-    top: 12px;
+    top: 14px;
     right: 14px;
 
-    width: 32px;
-    height: 32px;
+    width: 34px;
+    height: 34px;
 
     display: flex;
 
@@ -1052,7 +1052,7 @@ body {
     border: none;
     outline: none;
 
-    background: transparent !important;
+    background: transparent;
 
     color: var(--text-muted);
 
@@ -1064,13 +1064,12 @@ body {
     appearance: none;
     -webkit-appearance: none;
 
-    box-shadow: none !important;
+    z-index: 3;
 
     transition:
         color 0.15s ease,
         transform 0.15s ease;
 }
-
 
 .radio-favorite:hover {
     color: #ffd54a;
@@ -1078,6 +1077,66 @@ body {
     transform: scale(1.12);
 }
 
+.radio-favorite.favorited {
+    color: #ffd54a;
+}
+
+.radio-favorite:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+.radio-live {
+    display: flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    margin-top: 6px;
+
+    color: #ff5f6d;
+
+    font-size: 10px;
+
+    font-weight: 800;
+
+    letter-spacing: 0.8px;
+}
+
+.radio-live-dot {
+    width: 7px;
+    height: 7px;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+
+    background: #ff4d5a;
+
+    box-shadow:
+        0 0 8px
+        rgba(255, 77, 90, 0.75);
+
+    animation:
+        livePulse 1.2s infinite;
+}
+
+@keyframes livePulse {
+
+    0%,
+    100% {
+        opacity: 0.55;
+
+        transform: scale(0.9);
+    }
+
+    50% {
+        opacity: 1;
+
+        transform: scale(1.15);
+    }
+}
 
 .radio-favorite:active {
     transform: scale(0.92);
