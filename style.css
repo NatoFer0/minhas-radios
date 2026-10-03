@@ -1027,3 +1027,68 @@ body {
     display: inline-block;
     vertical-align: middle;
 }
+
+/* ================================
+   FAVORITO DA RÁDIO
+================================ */
+
+.radio-favorite {
+    position: absolute;
+
+    top: 12px;
+    right: 14px;
+
+    width: 32px;
+    height: 32px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+    margin: 0;
+
+    border: none;
+    outline: none;
+
+    background: transparent !important;
+
+    color: var(--text-muted);
+
+    font-size: 22px;
+    line-height: 1;
+
+    cursor: pointer;
+
+    appearance: none;
+    -webkit-appearance: none;
+
+    box-shadow: none !important;
+
+    transition:
+        color 0.15s ease,
+        transform 0.15s ease;
+}
+
+
+.radio-favorite:hover {
+    color: #ffd54a;
+
+    transform: scale(1.12);
+}
+
+
+.radio-favorite:active {
+    transform: scale(0.92);
+}
+
+
+.radio-favorite:focus {
+    outline: none;
+
+    background: transparent !important;
+
+    box-shadow: none !important;
+}
+
