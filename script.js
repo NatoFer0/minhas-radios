@@ -869,7 +869,7 @@ function createRadioCard(
         type="button"
         title="Tocar rádio"
     >
-        ${isCurrent ? "⏸" : "▶"}
+        ${isCurrent ? "⏹" : "▶"}
     </button>
 
 `;
@@ -992,7 +992,7 @@ async function playRadio(
 
 
         playPauseButton.textContent =
-            "⏸";
+            "⏹";
 
 
         playerStatus.textContent =
@@ -1028,9 +1028,8 @@ async function playRadio(
 
 }
 
-
 /* ==========================================
-   PLAY / PAUSE
+   PLAY / PARAR
 ========================================== */
 
 playPauseButton.addEventListener(
@@ -1052,43 +1051,41 @@ playPauseButton.addEventListener(
 
 
         /*
-         * Se estiver pausado,
-         * tenta continuar.
+         * Se estiver tocando,
+         * o botão agora funciona como PARAR.
          */
 
-        if (
-            audioPlayer.paused
-        ) {
+        if (!audioPlayer.paused) {
 
-            try {
+            audioPlayer.pause();
 
-                await audioPlayer.play();
+            /*
+             * Remove completamente a conexão
+             * com o stream atual.
+             *
+             * Isso impede que o navegador
+             * continue mantendo o ponto anterior
+             * da transmissão.
+             */
 
+            audioPlayer.removeAttribute(
+                "src"
+            );
 
-                playPauseButton.textContent =
-                    "⏸";
-
-
-                playerStatus.textContent =
-                    "Ao vivo";
-
-
-                renderRadios(
-                    searchInput.value
-                );
+            audioPlayer.load();
 
 
-            } catch (error) {
-
-                console.error(
-                    error
-                );
+            playPauseButton.textContent =
+                "▶";
 
 
-                playerStatus.textContent =
-                    "Não foi possível iniciar a rádio.";
+            playerStatus.textContent =
+                "Parado";
 
-            }
+
+            renderRadios(
+                searchInput.value
+            );
 
 
             return;
@@ -1097,24 +1094,63 @@ playPauseButton.addEventListener(
 
 
         /*
-         * Caso esteja tocando,
-         * pausa.
+         * Se estiver parado,
+         * inicia uma NOVA conexão
+         * com a rádio atual.
+         *
+         * Isso faz o usuário voltar
+         * para o ponto atual da transmissão.
          */
 
-        audioPlayer.pause();
+        try {
+
+            playerStatus.textContent =
+                "Conectando...";
 
 
-        playPauseButton.textContent =
-            "▶";
+            playPauseButton.textContent =
+                "⏳";
 
 
-        playerStatus.textContent =
-            "Pausado";
+            audioPlayer.src =
+                currentRadio.url;
 
 
-        renderRadios(
-            searchInput.value
-        );
+            audioPlayer.load();
+
+
+            await audioPlayer.play();
+
+
+            playPauseButton.textContent =
+                "⏹";
+
+
+            playerStatus.textContent =
+                "Ao vivo";
+
+
+            renderRadios(
+                searchInput.value
+            );
+
+
+        } catch (error) {
+
+            console.error(
+                "Erro ao iniciar rádio:",
+                error
+            );
+
+
+            playPauseButton.textContent =
+                "▶";
+
+
+            playerStatus.textContent =
+                "Não foi possível iniciar a rádio.";
+
+        }
 
     }
 );
@@ -1282,7 +1318,7 @@ audioPlayer.addEventListener(
     () => {
 
         playPauseButton.textContent =
-            "⏸";
+            "⏹";
 
 
         playerStatus.textContent =
