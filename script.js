@@ -1052,8 +1052,12 @@ async function playRadio(
             "⏹";
 
 
-        playerStatus.textContent =
-            "Ao vivo";
+        playerStatus.innerHTML = `
+            <span class="radio-live">
+                <span class="radio-live-dot"></span>
+                AO VIVO
+            </span>
+        `;
 
 
         renderRadios(
@@ -1185,8 +1189,12 @@ playPauseButton.addEventListener(
                 "⏹";
 
 
-            playerStatus.textContent =
-                "Ao vivo";
+            playerStatus.innerHTML = `
+                <span class="radio-live">
+                    <span class="radio-live-dot"></span>
+                    AO VIVO
+                </span>
+            `;
 
 
             renderRadios(
@@ -1380,9 +1388,12 @@ audioPlayer.addEventListener(
             "⏹";
 
 
-        playerStatus.textContent =
-            "Ao vivo";
-
+        playerStatus.innerHTML = `
+            <span class="radio-live">
+                <span class="radio-live-dot"></span>
+                AO VIVO
+            </span>
+        `;
 
         renderRadios(
             searchInput.value
