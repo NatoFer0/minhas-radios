@@ -807,12 +807,10 @@ function createRadioCard(
 
     }
 
-
     const isCurrent =
         currentRadio &&
         currentRadio.url === radio.url &&
         !audioPlayer.paused;
-
 
     card.innerHTML = `
 
@@ -825,6 +823,17 @@ function createRadioCard(
             radio.name
         )}
     </div>
+
+    ${
+    isCurrent
+        ? `
+            <div class="radio-live">
+                <span class="radio-live-dot"></span>
+                AO VIVO
+            </div>
+        `
+        : ""
+    }
 
     <div class="radio-country">
         ${escapeHTML(
