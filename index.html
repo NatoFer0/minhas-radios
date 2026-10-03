@@ -33,27 +33,55 @@
             >
         </div>
 
-                <div class="sort-box">
+        <div class="toolbar">
 
-            <label for="sortSelect">
-                Ordenar sessões
-            </label>
+            <div class="recent-box">
+        
+                <button
+                    id="recentButton"
+                    class="recent-button"
+                    type="button"
+                    aria-expanded="false"
+                    aria-haspopup="true"
+                >
+                    ↻
+                    <span>Ouvidas recentemente</span>
+                </button>
+        
+                <div
+                    id="recentDropdown"
+                    class="recent-dropdown"
+                >
+                </div>
+        
+            </div>
+        
+        
+            <div class="sort-box">
+        
+                <label for="sortSelect">
+                    Ordenar sessões
+                </label>
+        
+                <select id="sortSelect">
+        
+                    <option value="original">
+                        📄 Ordem original
+                    </option>
+        
+                    <option value="az">
+                        🔤 A → Z
+                    </option>
+        
+                    <option value="za">
+                        🔤 Z → A
+                    </option>
+        
+                </select>
+        
+            </div>
+</div>
 
-            <select id="sortSelect">
-                <option value="original">
-                    📄 Ordem original
-                </option>
-
-                <option value="az">
-                    🔤 A → Z
-                </option>
-
-                <option value="za">
-                    🔤 Z → A
-                </option>
-            </select>
-
-        </div>
 
     </header>
 
