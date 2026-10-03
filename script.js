@@ -29,9 +29,14 @@ const muteButton =
 const volumeControl =
     document.getElementById("volumeControl");
 
+const volumeValue =
+    document.getElementById("volumeValue");
+
+const VOLUME_STORAGE_KEY =
+    "minhasRadios_volume";
+
 let previousVolume =
     Number(volumeControl.value);
-
 
 let radios = [];
 
@@ -126,13 +131,60 @@ document.addEventListener(
     "DOMContentLoaded",
     () => {
 
+        const savedVolume =
+            localStorage.getItem(
+                VOLUME_STORAGE_KEY
+            );
+
+        const initialVolume =
+            savedVolume !== null
+                ? Number(savedVolume)
+                : Number(volumeControl.value);
+
+
+        volumeControl.value =
+            initialVolume;
+
+
         audioPlayer.volume =
-            Number(volumeControl.value);
+            initialVolume;
+
+
+        previousVolume =
+            initialVolume > 0
+                ? initialVolume
+                : 0.8;
+
+
+        volumeValue.textContent =
+            Math.round(
+                initialVolume * 100
+            );
+
+
+        if (initialVolume === 0) {
+
+            muteButton.textContent =
+                "🔇";
+
+            muteButton.setAttribute(
+                "aria-label",
+                "Ativar som"
+            );
+
+            muteButton.setAttribute(
+                "title",
+                "Ativar som"
+            );
+
+        }
+
 
         loadPlaylist();
 
     }
 );
+
 
 
 /* ==========================================
@@ -1237,7 +1289,17 @@ volumeControl.addEventListener(
         audioPlayer.volume =
             volume;
 
+        volumeValue.textContent =
+            Math.round(
+                volume * 100
+            );
 
+        localStorage.setItem(
+            VOLUME_STORAGE_KEY,
+            volume
+        );
+
+        
         if (volume > 0) {
 
             previousVolume =
@@ -1296,6 +1358,14 @@ muteButton.addEventListener(
             volumeControl.value =
                 0;
 
+            volumeValue.textContent =
+                "0";
+
+            localStorage.setItem(
+                VOLUME_STORAGE_KEY,
+                0
+            );
+
             muteButton.textContent =
                 "🔇";
 
@@ -1321,6 +1391,17 @@ muteButton.addEventListener(
 
             volumeControl.value =
                 volume;
+
+            volumeValue.textContent =
+                Math.round(
+                    volume * 100
+                );
+
+            localStorage.setItem(
+                VOLUME_STORAGE_KEY,
+                volume
+            );
+
 
             muteButton.textContent =
                 "🔊";
