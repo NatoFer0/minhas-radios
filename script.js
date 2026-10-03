@@ -835,7 +835,7 @@ function createRadioCard(
     </div>
 
     <button
-        class="radio-favorite"
+        class="radio-favorite ${isFavorite(radio) ? "favorited" : ""}"
         type="button"
         title="${
             isFavorite(radio)
