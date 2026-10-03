@@ -929,22 +929,6 @@ function createRadioCard(
 
 
     /*
-     * Clicar no card toca a rádio.
-     */
-
-    card.addEventListener(
-        "click",
-        () => {
-
-            playRadio(
-                radio
-            );
-
-        }
-    );
-
-
-    /*
      * Evita que o clique no botão
      * seja tratado duas vezes.
      */
