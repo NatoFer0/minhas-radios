@@ -904,17 +904,74 @@ function createRadioCard(
 
 
     button.addEventListener(
-        "click",
-        event => {
+    "click",
+    event => {
 
-            event.stopPropagation();
+        event.stopPropagation();
 
-            playRadio(
-                radio
+
+        /*
+         * Se esta rádio é a que está tocando,
+         * o botão do card funciona como PARAR.
+         */
+
+        if (
+            currentRadio &&
+            currentRadio.url === radio.url &&
+            !audioPlayer.paused
+        ) {
+
+            audioPlayer.pause();
+
+            /*
+             * Remove completamente a conexão
+             * com o stream atual.
+             */
+
+            audioPlayer.removeAttribute(
+                "src"
             );
 
+            audioPlayer.load();
+
+
+            /*
+             * Volta o player para o estado inicial.
+             */
+
+            currentRadio = null;
+
+            currentStation.textContent =
+                "Nenhuma rádio selecionada";
+
+            playPauseButton.textContent =
+                "▶";
+
+            playerStatus.textContent =
+                "Escolha uma rádio para começar.";
+
+
+            renderRadios(
+                searchInput.value
+            );
+
+
+            return;
+
         }
-    );
+
+
+        /*
+         * Caso contrário, toca a rádio normalmente.
+         */
+
+        playRadio(
+            radio
+        );
+
+    }
+);
+
 
     const favoriteButton =
     card.querySelector(
