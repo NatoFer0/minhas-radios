@@ -40,6 +40,20 @@ let currentRadio = null;
 let currentSort = "original";
 
 /* ==========================================
+   FAVORITOS
+========================================== */
+
+const FAVORITES_STORAGE_KEY =
+    "minhasRadios_favoritos";
+
+let favoriteRadios =
+    JSON.parse(
+        localStorage.getItem(
+            FAVORITES_STORAGE_KEY
+        ) || "[]"
+    );
+
+/* ==========================================
    ÍCONES DAS CATEGORIAS
 ========================================== */
 
@@ -364,6 +378,76 @@ function parseM3U(text) {
 
 }
 
+/* ==========================================
+   FAVORITOS
+========================================== */
+
+function isFavorite(radio) {
+
+    return favoriteRadios.includes(
+        radio.url
+    );
+
+}
+
+
+function saveFavorites() {
+
+    localStorage.setItem(
+        FAVORITES_STORAGE_KEY,
+        JSON.stringify(favoriteRadios)
+    );
+
+}
+
+
+function toggleFavorite(radio) {
+
+    const index =
+        favoriteRadios.indexOf(
+            radio.url
+        );
+
+
+    if (index === -1) {
+
+        /*
+         * Rádio ainda não é favorita.
+         * Adiciona aos favoritos.
+         */
+
+        favoriteRadios.push(
+            radio.url
+        );
+
+    } else {
+
+        /*
+         * Rádio já é favorita.
+         * Remove dos favoritos.
+         */
+
+        favoriteRadios.splice(
+            index,
+            1
+        );
+
+    }
+
+
+    saveFavorites();
+
+
+    /*
+     * Atualiza a tela mantendo
+     * a pesquisa atual.
+     */
+
+    renderRadios(
+        searchInput.value
+    );
+
+}
 
 /* ==========================================
    RENDERIZAR RÁDIOS
@@ -627,33 +711,55 @@ function createRadioCard(
 
     card.innerHTML = `
 
-        <div class="radio-icon">
-            📻
-        </div>
+    <div class="radio-icon">
+        📻
+    </div>
 
-        <div class="radio-name">
-            ${escapeHTML(
-                radio.name
-            )}
-        </div>
+    <div class="radio-name">
+        ${escapeHTML(
+            radio.name
+        )}
+    </div>
 
-        <div class="radio-country">
-            ${escapeHTML(
-                radio.displayCategory ||
-                radio.category ||
-                "Outras"
-            )}
-        </div>
+    <div class="radio-country">
+        ${escapeHTML(
+            radio.displayCategory ||
+            radio.category ||
+            "Outras"
+        )}
+    </div>
 
-        <button
-            class="radio-play"
-            type="button"
-            title="Tocar rádio"
-        >
-            ${isCurrent ? "⏸" : "▶"}
-        </button>
+    <button
+        class="radio-favorite"
+        type="button"
+        title="${
+            isFavorite(radio)
+                ? "Desfavoritar rádio"
+                : "Favoritar rádio"
+        }"
+        aria-label="${
+            isFavorite(radio)
+                ? "Desfavoritar rádio"
+                : "Favoritar rádio"
+        }"
+    >
+        ${
+            isFavorite(radio)
+                ? "★"
+                : "☆"
+        }
+    </button>
 
-    `;
+    <button
+        class="radio-play"
+        type="button"
+        title="Tocar rádio"
+    >
+        ${isCurrent ? "⏸" : "▶"}
+    </button>
+
+`;
+
 
 
     /*
@@ -695,6 +801,31 @@ function createRadioCard(
 
         }
     );
+
+    const favoriteButton =
+    card.querySelector(
+        ".radio-favorite"
+    );
+
+
+favoriteButton.addEventListener(
+    "click",
+    event => {
+
+        /*
+         * Impede que o clique na estrela
+         * também toque a rádio.
+         */
+
+        event.stopPropagation();
+
+
+        toggleFavorite(
+            radio
+        );
+
+    }
+);
 
 
     return card;
