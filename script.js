@@ -97,7 +97,7 @@ const categoryIcons = {
 
     "Espanha": '<img src="https://flagcdn.io/flags/4x3/es.svg" alt="Espanha">',
 
-    "Itália": '<img src="https://flagcdn.io/flags/4x3/es.svg" alt="Italia">',
+    "Itália": '<img src="https://flagcdn.io/flags/4x3/it.svg" alt="Italia">',
 
     "Disney": "🏰",
 
