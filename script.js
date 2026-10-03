@@ -527,11 +527,7 @@ const favoriteList =
 
 
 const normalRadios =
-    filteredRadios.filter(
-        radio =>
-            !isFavorite(radio)
-    );
-
+    filteredRadios;
 
 /*
  * Agrupa somente as rádios
