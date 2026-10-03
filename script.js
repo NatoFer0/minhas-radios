@@ -514,38 +514,147 @@ function renderRadios(
     const categories = {};
 
 
-    filteredRadios.forEach(
+/*
+ * Separa as rádios favoritas
+ * das demais rádios.
+ */
+
+const favoriteList =
+    filteredRadios.filter(
+        radio =>
+            isFavorite(radio)
+    );
+
+
+const normalRadios =
+    filteredRadios.filter(
+        radio =>
+            !isFavorite(radio)
+    );
+
+
+/*
+ * Agrupa somente as rádios
+ * normais por categoria.
+ */
+
+normalRadios.forEach(
+    radio => {
+
+        const category =
+            radio.displayCategory ||
+            radio.category ||
+            "Outras";
+
+
+        if (
+            !categories[category]
+        ) {
+
+            categories[category] =
+                [];
+
+        }
+
+
+        categories[category].push(
+            radio
+        );
+
+    }
+);
+
+
+radioApp.innerHTML = "";
+
+
+/*
+ * As categorias normais continuam
+ * usando a ordenação existente.
+ */
+
+let categoryEntries =
+    Object.entries(
+        categories
+    );
+
+/*
+ * ================================
+ * SEÇÃO DE FAVORITOS
+ * ================================
+ */
+
+if (
+    favoriteList.length > 0
+) {
+
+    const section =
+        document.createElement(
+            "section"
+        );
+
+
+    section.className =
+        "category favorites-category";
+
+
+    section.innerHTML = `
+
+        <div class="category-title">
+
+            <span>
+                ⭐
+            </span>
+
+            <span>
+                Favoritos
+            </span>
+
+            <span
+                class="category-count"
+            >
+                ${favoriteList.length}
+            </span>
+
+        </div>
+
+        <div
+            class="radio-grid"
+        ></div>
+
+    `;
+
+
+    const grid =
+        section.querySelector(
+            ".radio-grid"
+        );
+
+
+    favoriteList.forEach(
         radio => {
 
-            const category =
-                radio.displayCategory ||
-                radio.category ||
-                "Outras";
+            const card =
+                createRadioCard(
+                    radio
+                );
 
 
-            if (
-                !categories[category]
-            ) {
-
-                categories[category] =
-                    [];
-
-            }
-
-
-            categories[category].push(
-                radio
+            grid.appendChild(
+                card
             );
 
         }
     );
 
 
-    radioApp.innerHTML = "";
+    radioApp.appendChild(
+        section
+    );
+
+}
 
 
-    let categoryEntries =
-    Object.entries(categories);
 
 
 /*
