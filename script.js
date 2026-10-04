@@ -34,6 +34,12 @@ const recentButton =
 const recentDropdown =
     document.getElementById("recentDropdown");
 
+const popularButton =
+    document.getElementById("popularButton");
+
+const popularDropdown =
+    document.getElementById("popularDropdown");
+
 const themeButton =
     document.getElementById("themeButton");
 
@@ -149,6 +155,23 @@ let recentRadios =
             RECENT_STORAGE_KEY
         ) || "[]"
     );
+
+const POPULAR_STORAGE_KEY =
+    "minhasRadios_maisEscutadas";
+
+const LISTEN_TIME_REQUIRED =
+    5 * 60 * 1000;
+
+let popularRadios =
+    JSON.parse(
+        localStorage.getItem(
+            POPULAR_STORAGE_KEY
+        ) || "[]"
+    );
+
+let listeningRadio = null;
+
+let listeningTimer = null;
 
 const volumeValue =
     document.getElementById("volumeValue");
@@ -305,6 +328,7 @@ document.addEventListener(
         }
 
         renderRecentDropdown();
+        renderPopularDropdown();
 
         loadPlaylist();
 
@@ -673,6 +697,280 @@ function addToRecent(radio) {
 
 
     renderRecentDropdown();
+
+}
+
+/* ==========================================
+   CONTADOR - RÁDIOS MAIS ESCUTADAS
+========================================== */
+
+function startListeningCounter(radio) {
+
+    /*
+     * Cancela qualquer contador anterior.
+     */
+
+    stopListeningCounter();
+
+
+    listeningRadio =
+        radio;
+
+    /*
+     * Só registra a escuta depois
+     * de 5 minutos.
+     */
+
+    listeningTimer =
+        setTimeout(
+            () => {
+
+                /*
+                 * Só contabiliza se a rádio
+                 * ainda for a rádio atual
+                 * e estiver realmente tocando.
+                 */
+
+                if (
+                    currentRadio &&
+                    currentRadio.url === radio.url &&
+                    !audioPlayer.paused
+                ) {
+
+                    registerRadioListen(
+                        radio
+                    );
+
+                }
+
+            },
+            LISTEN_TIME_REQUIRED
+        );
+
+}
+
+function stopListeningCounter() {
+
+    if (
+        listeningTimer
+    ) {
+
+        clearTimeout(
+            listeningTimer
+        );
+
+    }
+
+
+    listeningTimer =
+        null;
+
+    listeningRadio =
+        null;
+
+}
+
+
+function registerRadioListen(radio) {
+
+    if (!radio) {
+        return;
+    }
+
+
+    const existing =
+        popularRadios.find(
+            item =>
+                item.url === radio.url
+        );
+
+
+    if (existing) {
+
+        existing.count += 1;
+
+    } else {
+
+        popularRadios.push({
+            name: radio.name,
+            url: radio.url,
+            count: 1
+        });
+
+    }
+
+
+    /*
+     * Ordena da mais escutada
+     * para a menos escutada.
+     */
+
+    popularRadios.sort(
+        (a, b) =>
+            b.count - a.count
+    );
+
+
+    /*
+     * Mantém somente as 5 primeiras
+     * no ranking salvo.
+     */
+
+    popularRadios =
+        popularRadios.slice(0, 5);
+
+
+    localStorage.setItem(
+        POPULAR_STORAGE_KEY,
+        JSON.stringify(
+            popularRadios
+        )
+    );
+
+
+    renderPopularDropdown();
+
+
+    /*
+     * Evita que a mesma sessão
+     * seja contabilizada novamente.
+     */
+
+    listeningTimer =
+        null;
+
+}
+
+
+/* ==========================================
+   RENDERIZAR MAIS ESCUTADAS
+========================================== */
+
+function renderPopularDropdown() {
+
+    popularDropdown.innerHTML = "";
+
+
+    if (!popularRadios.length) {
+
+        popularDropdown.innerHTML = `
+            <div class="recent-empty">
+                Nenhuma rádio ranqueada ainda.
+            </div>
+        `;
+
+        return;
+
+    }
+
+
+    popularRadios.forEach(
+        (radio, index) => {
+
+            const item =
+                document.createElement(
+                    "button"
+                );
+
+
+            item.type =
+                "button";
+
+
+            item.className =
+                "recent-item";
+
+
+            item.innerHTML = `
+
+                <span
+                    class="popular-position"
+                >
+                    ${index + 1}º
+                </span>
+
+                <span
+                    class="recent-item-info"
+                >
+
+                    <span
+                        class="recent-item-name"
+                    >
+                        ${escapeHTML(
+                            radio.name
+                        )}
+                    </span>
+
+                    <span
+                        class="recent-item-category"
+                    >
+                        ${radio.count}
+                        ${
+                            radio.count === 1
+                                ? "escuta"
+                                : "escutas"
+                        }
+                    </span>
+
+                </span>
+
+                <span
+                    class="recent-item-play"
+                >
+                    ▶
+                </span>
+
+            `;
+
+
+            item.title =
+                "Tocar " +
+                radio.name;
+
+
+            item.addEventListener(
+                "click",
+                event => {
+
+                    event.stopPropagation();
+
+
+                    const foundRadio =
+                        radios.find(
+                            item =>
+                                item.url === radio.url
+                        );
+
+
+                    if (foundRadio) {
+
+                        playRadio(
+                            foundRadio
+                        );
+
+                    }
+
+
+                    popularDropdown.classList.remove(
+                        "open"
+                    );
+
+
+                    popularButton.setAttribute(
+                        "aria-expanded",
+                        "false"
+                    );
+
+                }
+            );
+
+
+            popularDropdown.appendChild(
+                item
+            );
+
+        }
+    );
 
 }
 
@@ -1236,6 +1534,8 @@ function createRadioCard(
 
             audioPlayer.pause();
 
+            stopListeningCounter();
+
             /*
              * Remove completamente a conexão
              * com o stream atual.
@@ -1327,6 +1627,18 @@ async function playRadio(
 
     try {
 
+        /*
+         * Encerra imediatamente qualquer
+         * contador da rádio anterior.
+         */
+
+        stopListeningCounter();
+
+
+        /*
+         * Define a nova rádio atual.
+         */
+
         currentRadio =
             radio;
 
@@ -1344,7 +1656,7 @@ async function playRadio(
 
 
         /*
-         * Define a URL do stream.
+         * Define a URL do novo stream.
          */
 
         audioPlayer.src =
@@ -1355,15 +1667,22 @@ async function playRadio(
 
 
         /*
-         * Tenta iniciar imediatamente.
+         * Inicia a nova conexão.
          */
 
         await audioPlayer.play();
 
+
         addToRecent(
             radio
         );
-        
+
+
+        startListeningCounter(
+            radio
+        );
+
+
         playPauseButton.textContent =
             "⏹";
 
@@ -1436,6 +1755,8 @@ playPauseButton.addEventListener(
 
             audioPlayer.pause();
 
+            stopListeningCounter();
+
             /*
             * Remove completamente a conexão
             * com o stream atual.
@@ -1499,6 +1820,10 @@ playPauseButton.addEventListener(
 
 
             await audioPlayer.play();
+
+            startListeningCounter(
+                currentRadio
+            );
 
 
             playPauseButton.textContent =
@@ -1759,6 +2084,49 @@ document.addEventListener(
     }
 );
 
+/* ==========================================
+   MAIS ESCUTADAS
+========================================== */
+
+popularButton.addEventListener(
+    "click",
+    event => {
+
+        event.stopPropagation();
+
+        const isOpen =
+            popularDropdown.classList.contains(
+                "open"
+            );
+
+
+        if (isOpen) {
+
+            popularDropdown.classList.remove(
+                "open"
+            );
+
+            popularButton.setAttribute(
+                "aria-expanded",
+                "false"
+            );
+
+            return;
+
+        }
+
+
+        popularDropdown.classList.add(
+            "open"
+        );
+
+        popularButton.setAttribute(
+            "aria-expanded",
+            "true"
+        );
+
+    }
+);
 
 /* ==========================================
    PESQUISA
@@ -1842,12 +2210,22 @@ audioPlayer.addEventListener(
     "error",
     () => {
 
+        stopListeningCounter();
+
         playPauseButton.textContent =
             "▶";
 
-
         playerStatus.textContent =
             "Erro ao acessar o stream.";
+
+        currentRadio = null;
+
+        currentStation.textContent =
+            "Nenhuma rádio selecionada";
+
+        renderRadios(
+            searchInput.value
+        );
 
     }
 );
