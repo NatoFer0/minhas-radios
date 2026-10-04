@@ -17,6 +17,94 @@
     --shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
 }
 
+/* ================================
+   TEMAS
+================================ */
+
+/* =================================
+   TEMA CLARO
+================================= */
+
+[data-theme="claro"] {
+
+    --bg: #f4f6fa;
+    --bg-secondary: #e9edf4;
+
+    --card: #ffffff;
+    --card-hover: #f1f3f7;
+
+    --accent: #6b4eff;
+    --accent-light: #7c5cff;
+    --cyan: #009fc2;
+
+    --text: #171b24;
+    --text-secondary: #4f5868;
+    --text-muted: #7b8493;
+
+    --border: rgba(20, 25, 35, 0.10);
+
+    --shadow:
+        0 10px 30px
+        rgba(20, 25, 35, 0.10);
+}
+
+
+/* =================================
+   TEMA ECLIPSE
+================================= */
+
+[data-theme="eclipse"] {
+
+    --bg: #34373d;
+    --bg-secondary: #2b2e34;
+
+    --card: #41454d;
+    --card-hover: #4b5059;
+
+    --accent: #8b72ff;
+    --accent-light: #a18dff;
+    --cyan: #21c8e8;
+
+    --text: #f2f3f5;
+    --text-secondary: #c2c6cd;
+    --text-muted: #949aa4;
+
+    --border: rgba(255, 255, 255, 0.12);
+
+    --shadow:
+        0 10px 30px
+        rgba(0, 0, 0, 0.25);
+}
+
+
+/* =================================
+   TEMA ESCURO
+================================= */
+
+[data-theme="escuro"] {
+
+    --bg: #020304;
+    --bg-secondary: #07090c;
+
+    --card: #0b0e12;
+    --card-hover: #12161c;
+
+    --accent: #7357ff;
+    --accent-light: #917cff;
+    --cyan: #00c8f2;
+
+    --text: #f5f5f5;
+    --text-secondary: #a7abb3;
+    --text-muted: #666b75;
+
+    --border: rgba(255, 255, 255, 0.07);
+
+    --shadow:
+        0 10px 30px
+        rgba(0, 0, 0, 0.45);
+}
+
+
 
 /* ================================
    RESET
