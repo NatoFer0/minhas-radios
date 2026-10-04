@@ -1350,6 +1350,12 @@ body {
     margin-top: 12px;
 }
 
+.popular-box,
+.recent-box,
+.sort-box {
+    position: relative;
+}
+
 
 /* ================================
    OUVIDAS RECENTEMENTE
