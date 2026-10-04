@@ -1401,6 +1401,60 @@ body {
         background 0.2s ease;
 }
 
+.popular-button {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    height: 38px;
+
+    padding:
+        0
+        12px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    color: var(--text-muted);
+
+    background:
+        transparent;
+
+    font-family: inherit;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        color 0.2s ease,
+        background 0.2s ease;
+}
+
+.popular-button:hover {
+    color: var(--text);
+
+    background:
+        rgba(255, 255, 255, 0.06);
+}
+
+.popular-button:focus {
+    outline: none;
+}
+
+.popular-button[aria-expanded="true"] {
+    color: var(--text);
+
+    background:
+        rgba(124, 92, 255, 0.14);
+}
+
+
 
 .recent-button:hover {
     color: var(--text);
@@ -1473,6 +1527,65 @@ body {
 
     z-index: 100;
 }
+
+.popular-dropdown {
+    position: absolute;
+
+    top: calc(100% + 8px);
+
+    right: 0;
+
+    width: 280px;
+
+    padding: 8px;
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius: 14px;
+
+    background:
+        var(--card);
+
+    box-shadow:
+        0 15px 40px
+        rgba(0, 0, 0, 0.35);
+
+    backdrop-filter:
+        blur(18px);
+
+    -webkit-backdrop-filter:
+        blur(18px);
+
+    opacity: 0;
+
+    visibility: hidden;
+
+    transform:
+        translateY(-5px);
+
+    pointer-events: none;
+
+    transition:
+        opacity 0.18s ease,
+        transform 0.18s ease,
+        visibility 0.18s ease;
+
+    z-index: 100;
+}
+
+.popular-dropdown.open {
+    opacity: 1;
+
+    visibility: visible;
+
+    transform:
+        translateY(0);
+
+    pointer-events: auto;
+}
+
 
 .recent-dropdown.open {
     opacity: 1;
@@ -1651,6 +1764,23 @@ body {
             calc(100vw - 28px)
         );
     }
+
+        .popular-dropdown {
+        left: 0;
+        right: auto;
+
+        width: min(
+            280px,
+            calc(100vw - 28px)
+        );
+    }
+
+    .popular-button {
+        padding:
+            0
+            9px;
+    }
+
 
 }
 
