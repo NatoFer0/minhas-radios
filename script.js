@@ -34,6 +34,112 @@ const recentButton =
 const recentDropdown =
     document.getElementById("recentDropdown");
 
+const themeButton =
+    document.getElementById("themeButton");
+
+const THEME_STORAGE_KEY =
+    "minhasRadios_tema";
+
+const THEMES = [
+    {
+        name: "original",
+        icon: "◈",
+        label: "Tema Original"
+    },
+    {
+        name: "claro",
+        icon: "☀️",
+        label: "Tema Claro"
+    },
+    {
+        name: "eclipse",
+        icon: "🌘",
+        label: "Tema Eclipse"
+    },
+    {
+        name: "escuro",
+        icon: "🌑",
+        label: "Tema Escuro"
+    }
+];
+
+let currentThemeIndex = 0;
+
+function applyTheme(themeIndex) {
+
+    const theme =
+        THEMES[themeIndex];
+
+    document.documentElement.setAttribute(
+        "data-theme",
+        theme.name
+    );
+
+    themeButton.textContent =
+        theme.icon;
+
+    themeButton.setAttribute(
+        "aria-label",
+        theme.label
+    );
+
+    themeButton.setAttribute(
+        "title",
+        theme.label
+    );
+
+    currentThemeIndex =
+        themeIndex;
+
+    localStorage.setItem(
+        THEME_STORAGE_KEY,
+        theme.name
+    );
+
+}
+
+function loadSavedTheme() {
+
+    const savedTheme =
+        localStorage.getItem(
+            THEME_STORAGE_KEY
+        );
+
+    const savedIndex =
+        THEMES.findIndex(
+            theme =>
+                theme.name === savedTheme
+        );
+
+    if (savedIndex !== -1) {
+
+        applyTheme(
+            savedIndex
+        );
+
+    } else {
+
+        applyTheme(0);
+
+    }
+
+}
+
+themeButton.addEventListener(
+    "click",
+    () => {
+
+        currentThemeIndex =
+            (currentThemeIndex + 1) %
+            THEMES.length;
+
+        applyTheme(
+            currentThemeIndex
+        );
+
+    }
+);
+
 const RECENT_STORAGE_KEY =
     "minhasRadios_ouvidasRecentemente";
 
@@ -148,6 +254,8 @@ document.addEventListener(
     "DOMContentLoaded",
     () => {
 
+        loadSavedTheme();
+        
         const savedVolume =
             localStorage.getItem(
                 VOLUME_STORAGE_KEY
