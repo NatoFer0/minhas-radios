@@ -1710,3 +1710,21 @@ body {
 .theme-button:focus {
     outline: none;
 }
+
+/* ================================
+   POSIÇÃO DO RANKING
+================================ */
+
+.popular-position {
+    width: 28px;
+
+    flex-shrink: 0;
+
+    color: var(--accent-light);
+
+    font-size: 12px;
+
+    font-weight: 800;
+
+    text-align: center;
+}
