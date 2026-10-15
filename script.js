@@ -1,581 +1,262 @@
+/* ==========================================
+   CONSTANTES E CONFIGURAÇÕES
+========================================== */
+
 const PLAYLIST_URL =
     "https://gist.githubusercontent.com/NatoFer0/c5174eb31972b0fddbb5e4bb460f0bc2/raw/radios.m3u";
 
-const audioPlayer =
-    document.getElementById("audioPlayer");
+const STORAGE_KEYS = {
+    THEME: "minhasRadios_tema",
+    RECENT: "minhasRadios_ouvidasRecentemente",
+    POPULAR: "minhasRadios_maisEscutadas",
+    VOLUME: "minhasRadios_volume",
+    FAVORITES: "minhasRadios_favoritos"
+};
 
-const radioApp =
-    document.getElementById("radioApp");
-
-const searchInput =
-    document.getElementById("searchInput");
-
-const sortSelect =
-    document.getElementById("sortSelect");
-
-const currentStation =
-    document.getElementById("currentStation");
-
-const playerStatus =
-    document.getElementById("playerStatus");
-
-const playPauseButton =
-    document.getElementById("playPauseButton");
-
-const muteButton =
-    document.getElementById("muteButton");
-
-const volumeControl =
-    document.getElementById("volumeControl");
-
-const recentButton =
-    document.getElementById("recentButton");
-
-const recentDropdown =
-    document.getElementById("recentDropdown");
-
-const popularButton =
-    document.getElementById("popularButton");
-
-const popularDropdown =
-    document.getElementById("popularDropdown");
-
-const themeButton =
-    document.getElementById("themeButton");
-
-const THEME_STORAGE_KEY =
-    "minhasRadios_tema";
+const LISTEN_TIME_REQUIRED = 5 * 60 * 1000; // 5 minutos
+const MAX_HISTORY_ITEMS = 5;
 
 const THEMES = [
-    {
-        name: "original",
-        icon: "◈",
-        label: "Tema Original"
-    },
-    {
-        name: "claro",
-        icon: "☀️",
-        label: "Tema Claro"
-    },
-    {
-        name: "eclipse",
-        icon: "🌘",
-        label: "Tema Eclipse"
-    },
-    {
-        name: "escuro",
-        icon: "🌑",
-        label: "Tema Escuro"
-    }
+    { name: "original", icon: "◈", label: "Tema Original" },
+    { name: "claro", icon: "☀️", label: "Tema Claro" },
+    { name: "eclipse", icon: "🌘", label: "Tema Eclipse" },
+    { name: "escuro", icon: "🌑", label: "Tema Escuro" }
 ];
 
+const CATEGORY_ICONS = {
+    "Brasil": '<img src="https://flagcdn.io/flags/4x3/br.svg" alt="Brasil">',
+    "Argentina": '<img src="https://flagcdn.io/flags/4x3/ar.svg" alt="Argentina">',
+    "Uruguai": '<img src="https://flagcdn.io/flags/4x3/uy.svg" alt="Uruguai">',
+    "Uruguay": '<img src="https://flagcdn.io/flags/4x3/uy.svg" alt="Uruguay">',
+    "Chile": '<img src="https://flagcdn.io/flags/4x3/cl.svg" alt="Chile">',
+    "Paraguai": '<img src="https://flagcdn.io/flags/4x3/py.svg" alt="Paraguai">',
+    "Paraguay": '<img src="https://flagcdn.io/flags/4x3/py.svg" alt="Paraguay">',
+    "México": '<img src="https://flagcdn.io/flags/4x3/mx.svg" alt="México">',
+    "Mexico": '<img src="https://flagcdn.io/flags/4x3/mx.svg" alt="Mexico">',
+    "Colômbia": '<img src="https://flagcdn.io/flags/4x3/co.svg" alt="Colômbia">',
+    "Colombia": '<img src="https://flagcdn.io/flags/4x3/co.svg" alt="Colombia">',
+    "Peru": '<img src="https://flagcdn.io/flags/4x3/pe.svg" alt="Peru">',
+    "Estados Unidos": '<img src="https://flagcdn.io/flags/4x3/us.svg" alt="Estados Unidos">',
+    "USA": '<img src="https://flagcdn.io/flags/4x3/us.svg" alt="USA">',
+    "Noruega": '<img src="https://flagcdn.io/flags/4x3/no.svg" alt="Noruega">',
+    "República Dominicana": '<img src="https://flagcdn.io/flags/4x3/do.svg" alt="República Dominicana">',
+    "Republica Dominicana": '<img src="https://flagcdn.io/flags/4x3/do.svg" alt="Republica Dominicana">',
+    "Equador": '<img src="https://flagcdn.io/flags/4x3/ec.svg" alt="Equador">',
+    "Porto Rico": '<img src="https://flagcdn.io/flags/4x3/pr.svg" alt="Porto Rico">',
+    "Alemanha": '<img src="https://flagcdn.io/flags/4x3/de.svg" alt="Alemanha">',
+    "Bolívia": '<img src="https://flagcdn.io/flags/4x3/bo.svg" alt="Bolivia">',
+    "França": '<img src="https://flagcdn.io/flags/4x3/fr.svg" alt="Franca">',
+    "Russia": '<img src="https://flagcdn.io/flags/4x3/ru.svg" alt="Russia">',
+    "Paquistão": '<img src="https://flagcdn.io/flags/4x3/pk.svg" alt="Paquistao">',
+    "Turquia": '<img src="https://flagcdn.io/flags/4x3/tr.svg" alt="Turquia">',
+    "Espanha": '<img src="https://flagcdn.io/flags/4x3/es.svg" alt="Espanha">',
+    "Itália": '<img src="https://flagcdn.io/flags/4x3/it.svg" alt="Italia">',
+    "Suiça": '<img src="https://flagcdn.io/flags/4x3/ch.svg" alt="Suica">',
+    "Disney": "🏰",
+    "Outras": "🌎"
+};
+
+const LIVE_BADGE_HTML = `
+    <span class="player-live">
+        <span class="radio-live-dot"></span>
+        AO VIVO
+    </span>
+`;
+
+/* ==========================================
+   ELEMENTOS DO DOM
+========================================== */
+
+const audioPlayer = document.getElementById("audioPlayer");
+const radioApp = document.getElementById("radioApp");
+const searchInput = document.getElementById("searchInput");
+const sortSelect = document.getElementById("sortSelect");
+const currentStation = document.getElementById("currentStation");
+const playerStatus = document.getElementById("playerStatus");
+const playPauseButton = document.getElementById("playPauseButton");
+const muteButton = document.getElementById("muteButton");
+const volumeControl = document.getElementById("volumeControl");
+const volumeValue = document.getElementById("volumeValue");
+const recentButton = document.getElementById("recentButton");
+const recentDropdown = document.getElementById("recentDropdown");
+const popularButton = document.getElementById("popularButton");
+const popularDropdown = document.getElementById("popularDropdown");
+const themeButton = document.getElementById("themeButton");
+
+/* ==========================================
+   UTILITÁRIOS DE ARMAZENAMENTO E SEGURANÇA
+========================================== */
+
+function loadFromStorage(key, fallback) {
+    try {
+        const stored = localStorage.getItem(key);
+        return stored !== null ? JSON.parse(stored) : fallback;
+    } catch (error) {
+        console.warn(`Erro ao ler ${key} do localStorage:`, error);
+        return fallback;
+    }
+}
+
+function saveToStorage(key, value) {
+    try {
+        const serialized = typeof value === "string" ? value : JSON.stringify(value);
+        localStorage.setItem(key, serialized);
+    } catch (error) {
+        console.warn(`Erro ao salvar ${key} no localStorage:`, error);
+    }
+}
+
+function escapeHTML(value) {
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+/* ==========================================
+   ESTADO DA APLICAÇÃO
+========================================== */
+
 let currentThemeIndex = 0;
+let radios = [];
+let currentRadio = null;
+let currentSort = "original";
+let listeningRadio = null;
+let listeningTimer = null;
+let previousVolume = Number(volumeControl.value);
+
+let recentRadios = loadFromStorage(STORAGE_KEYS.RECENT, []);
+let popularRadios = loadFromStorage(STORAGE_KEYS.POPULAR, []);
+let favoriteRadios = loadFromStorage(STORAGE_KEYS.FAVORITES, []);
+
+/* ==========================================
+   GERENCIAMENTO DE TEMAS
+========================================== */
 
 function applyTheme(themeIndex) {
+    const theme = THEMES[themeIndex];
 
-    const theme =
-        THEMES[themeIndex];
+    document.documentElement.setAttribute("data-theme", theme.name);
+    themeButton.textContent = theme.icon;
+    themeButton.setAttribute("aria-label", theme.label);
+    themeButton.setAttribute("title", theme.label);
 
-    document.documentElement.setAttribute(
-        "data-theme",
-        theme.name
-    );
-
-    themeButton.textContent =
-        theme.icon;
-
-    themeButton.setAttribute(
-        "aria-label",
-        theme.label
-    );
-
-    themeButton.setAttribute(
-        "title",
-        theme.label
-    );
-
-    currentThemeIndex =
-        themeIndex;
-
-    localStorage.setItem(
-        THEME_STORAGE_KEY,
-        theme.name
-    );
-
+    currentThemeIndex = themeIndex;
+    saveToStorage(STORAGE_KEYS.THEME, theme.name);
 }
 
 function loadSavedTheme() {
+    const savedTheme = localStorage.getItem(STORAGE_KEYS.THEME);
+    const savedIndex = THEMES.findIndex(theme => theme.name === savedTheme);
 
-    const savedTheme =
-        localStorage.getItem(
-            THEME_STORAGE_KEY
-        );
-
-    const savedIndex =
-        THEMES.findIndex(
-            theme =>
-                theme.name === savedTheme
-        );
-
-    if (savedIndex !== -1) {
-
-        applyTheme(
-            savedIndex
-        );
-
-    } else {
-
-        applyTheme(0);
-
-    }
-
+    applyTheme(savedIndex !== -1 ? savedIndex : 0);
 }
 
-themeButton.addEventListener(
-    "click",
-    () => {
-
-        currentThemeIndex =
-            (currentThemeIndex + 1) %
-            THEMES.length;
-
-        applyTheme(
-            currentThemeIndex
-        );
-
-    }
-);
-
-const RECENT_STORAGE_KEY =
-    "minhasRadios_ouvidasRecentemente";
-
-let recentRadios =
-    JSON.parse(
-        localStorage.getItem(
-            RECENT_STORAGE_KEY
-        ) || "[]"
-    );
-
-const POPULAR_STORAGE_KEY =
-    "minhasRadios_maisEscutadas";
-
-const LISTEN_TIME_REQUIRED =
-    5 * 60 * 1000;
-
-let popularRadios =
-    JSON.parse(
-        localStorage.getItem(
-            POPULAR_STORAGE_KEY
-        ) || "[]"
-    );
-
-let listeningRadio = null;
-
-let listeningTimer = null;
-
-const volumeValue =
-    document.getElementById("volumeValue");
-
-const VOLUME_STORAGE_KEY =
-    "minhasRadios_volume";
-
-let previousVolume =
-    Number(volumeControl.value);
-
-let radios = [];
-
-let currentRadio = null;
-
-let currentSort = "original";
-
-/* ==========================================
-   FAVORITOS
-========================================== */
-
-const FAVORITES_STORAGE_KEY =
-    "minhasRadios_favoritos";
-
-let favoriteRadios =
-    JSON.parse(
-        localStorage.getItem(
-            FAVORITES_STORAGE_KEY
-        ) || "[]"
-    );
-
-/* ==========================================
-   ÍCONES DAS CATEGORIAS
-========================================== */
-
-const categoryIcons = {
-
-    "Brasil": '<img src="https://flagcdn.io/flags/4x3/br.svg" alt="Brasil">',
-
-    "Argentina": '<img src="https://flagcdn.io/flags/4x3/ar.svg" alt="Argentina">',
-
-    "Uruguai": '<img src="https://flagcdn.io/flags/4x3/uy.svg" alt="Uruguai">',
-
-    "Uruguay": '<img src="https://flagcdn.io/flags/4x3/uy.svg" alt="Uruguay">',
-
-    "Chile": '<img src="https://flagcdn.io/flags/4x3/cl.svg" alt="Chile">',
-
-    "Paraguai": '<img src="https://flagcdn.io/flags/4x3/py.svg" alt="Paraguai">',
-
-    "Paraguay": '<img src="https://flagcdn.io/flags/4x3/py.svg" alt="Paraguay">',
-
-    "México": '<img src="https://flagcdn.io/flags/4x3/mx.svg" alt="México">',
-
-    "Mexico": '<img src="https://flagcdn.io/flags/4x3/mx.svg" alt="Mexico">',
-
-    "Colômbia": '<img src="https://flagcdn.io/flags/4x3/co.svg" alt="Colômbia">',
-
-    "Colombia": '<img src="https://flagcdn.io/flags/4x3/co.svg" alt="Colombia">',
-
-    "Peru": '<img src="https://flagcdn.io/flags/4x3/pe.svg" alt="Peru">',
-
-    "Estados Unidos": '<img src="https://flagcdn.io/flags/4x3/us.svg" alt="Estados Unidos">',
-
-    "USA": '<img src="https://flagcdn.io/flags/4x3/us.svg" alt="USA">',
-
-    "Noruega": '<img src="https://flagcdn.io/flags/4x3/no.svg" alt="Noruega">',
-
-    "República Dominicana": '<img src="https://flagcdn.io/flags/4x3/do.svg" alt="República Dominicana">',
-
-    "Republica Dominicana": '<img src="https://flagcdn.io/flags/4x3/do.svg" alt="Republica Dominicana">',
-
-    "Equador": '<img src="https://flagcdn.io/flags/4x3/ec.svg" alt="Equador">',
-
-    "Porto Rico": '<img src="https://flagcdn.io/flags/4x3/pr.svg" alt="Porto Rico">',
-
-    "Alemanha": '<img src="https://flagcdn.io/flags/4x3/de.svg" alt="Alemanha">',
-
-    "Bolívia": '<img src="https://flagcdn.io/flags/4x3/bo.svg" alt="Bolivia">',
-    
-    "França": '<img src="https://flagcdn.io/flags/4x3/fr.svg" alt="Franca">',
-    
-    "Russia": '<img src="https://flagcdn.io/flags/4x3/ru.svg" alt="Russia">',
-
-    "Paquistão": '<img src="https://flagcdn.io/flags/4x3/pk.svg" alt="Paquistao">',
-    
-    "Turquia": '<img src="https://flagcdn.io/flags/4x3/tr.svg" alt="Turquia">',
-
-    "Espanha": '<img src="https://flagcdn.io/flags/4x3/es.svg" alt="Espanha">',
-
-    "Itália": '<img src="https://flagcdn.io/flags/4x3/it.svg" alt="Italia">',
-
-    "Suiça": '<img src="https://flagcdn.io/flags/4x3/ch.svg" alt="Suica">',
-
-    "Disney": "🏰",
-
-    "Outras": "🌎"
-};
+themeButton.addEventListener("click", () => {
+    const nextIndex = (currentThemeIndex + 1) % THEMES.length;
+    applyTheme(nextIndex);
+});
 
 /* ==========================================
    INICIALIZAÇÃO
 ========================================== */
 
-document.addEventListener(
-    "DOMContentLoaded",
-    () => {
+document.addEventListener("DOMContentLoaded", () => {
+    loadSavedTheme();
 
-        loadSavedTheme();
-        
-        const savedVolume =
-            localStorage.getItem(
-                VOLUME_STORAGE_KEY
-            );
+    const savedVolume = localStorage.getItem(STORAGE_KEYS.VOLUME);
+    const initialVolume = savedVolume !== null
+        ? Number(savedVolume)
+        : Number(volumeControl.value);
 
-        const initialVolume =
-            savedVolume !== null
-                ? Number(savedVolume)
-                : Number(volumeControl.value);
+    previousVolume = initialVolume > 0 ? initialVolume : 0.8;
+    applyVolume(initialVolume, false);
 
-
-        volumeControl.value =
-            initialVolume;
-
-
-        audioPlayer.volume =
-            initialVolume;
-
-
-        previousVolume =
-            initialVolume > 0
-                ? initialVolume
-                : 0.8;
-
-
-        volumeValue.textContent =
-            Math.round(
-                initialVolume * 100
-            );
-
-
-        if (initialVolume === 0) {
-
-            muteButton.textContent =
-                "🔇";
-
-            muteButton.setAttribute(
-                "aria-label",
-                "Ativar som"
-            );
-
-            muteButton.setAttribute(
-                "title",
-                "Ativar som"
-            );
-
-        }
-
-        renderRecentDropdown();
-        renderPopularDropdown();
-
-        loadPlaylist();
-
-    }
-);
+    renderRecentDropdown();
+    renderPopularDropdown();
+    loadPlaylist();
+});
 
 /* ==========================================
-   CARREGAR PLAYLIST
+   CARREGAR E INTERPRETAR PLAYLIST (M3U)
 ========================================== */
 
 async function loadPlaylist() {
-
     try {
-
         showLoading();
 
-        const response =
-            await fetch(PLAYLIST_URL, {
-                cache: "no-cache"
-            });
-
+        const response = await fetch(PLAYLIST_URL, { cache: "no-cache" });
 
         if (!response.ok) {
-
-            throw new Error(
-                "Erro HTTP " +
-                response.status
-            );
-
+            throw new Error(`Erro HTTP ${response.status}`);
         }
 
-
-        const playlistText =
-            await response.text();
-
-
+        const playlistText = await response.text();
         parseM3U(playlistText);
 
-
         if (!radios.length) {
-        
-            throw new Error(
-                "Nenhuma rádio encontrada."
-            );
-        
+            throw new Error("Nenhuma rádio encontrada.");
         }
-        
-        
+
         renderRadios();
-
-
-
     } catch (error) {
-
-        console.error(
-            "Erro ao carregar playlist:",
-            error
-        );
-
+        console.error("Erro ao carregar playlist:", error);
         showError();
-
     }
-
 }
 
-
-/* ==========================================
-   INTERPRETAR M3U
-========================================== */
-
 function parseM3U(text) {
-
-    const lines =
-        text.split(/\r?\n/);
-
-    let currentRadioData =
-        null;
+    const lines = text.split(/\r?\n/);
+    let currentRadioData = null;
 
     radios = [];
 
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
 
-    for (
-        let i = 0;
-        i < lines.length;
-        i++
-    ) {
+        if (!line) continue;
 
-        const line =
-            lines[i].trim();
-
-
-        if (!line) {
-            continue;
-        }
-
-
-        /*
-         * EXTINF contém o nome da rádio.
-         *
-         * A categoria ainda não é definida
-         * aqui porque no seu Gist o EXTGRP
-         * aparece logo depois do EXTINF.
-         */
-
-        if (
-            line.startsWith("#EXTINF:")
-        ) {
-
-            const commaPosition =
-                line.indexOf(",");
-
-
-            let name =
-                "Rádio sem nome";
-
-
-            if (
-                commaPosition !== -1
-            ) {
-
-                name =
-                    line
-                        .substring(
-                            commaPosition + 1
-                        )
-                        .trim();
-
-            }
-
+        if (line.startsWith("#EXTINF:")) {
+            const commaPosition = line.indexOf(",");
+            const name = commaPosition !== -1
+                ? line.substring(commaPosition + 1).trim()
+                : "Rádio sem nome";
 
             currentRadioData = {
-
-                name: name,
-
-                category:
-                    "Outras",
-
-                displayCategory:
-                    "Outras",
-
+                name,
+                category: "Outras",
+                displayCategory: "Outras",
                 url: ""
-
             };
-
-
             continue;
         }
 
-
-        /*
-         * EXTGRP define a categoria
-         * da rádio atual.
-         *
-         * No seu Gist ele aparece DEPOIS
-         * do EXTINF, por isso precisamos
-         * associá-lo ao currentRadioData.
-         */
-
-        if (
-            line.startsWith("#EXTGRP:")
-        ) {
-
-            if (
-                currentRadioData
-            ) {
-
-                const category =
-                    line
-                        .substring(8)
-                        .trim();
-
-
-                currentRadioData.category =
-                    category ||
-                    "Outras";
-
-
-                currentRadioData.displayCategory =
-                    category ||
-                    "Outras";
-
+        if (line.startsWith("#EXTGRP:")) {
+            if (currentRadioData) {
+                const category = line.substring(8).trim() || "Outras";
+                currentRadioData.category = category;
+                currentRadioData.displayCategory = category;
             }
-
-
             continue;
         }
 
+        if (!line.startsWith("#") && currentRadioData) {
+            currentRadioData.url = line;
 
-        /*
-         * Qualquer linha que não comece
-         * com "#" será tratada como URL.
-         */
-
-        if (
-            !line.startsWith("#") &&
-            currentRadioData
-        ) {
-
-            currentRadioData.url =
-                line;
-
-
-            /*
-             * Disney continua agrupada
-             * automaticamente.
-             */
-
-            if (
-                currentRadioData.name
-                    .toLowerCase()
-                    .includes("disney")
-            ) {
-
-                currentRadioData.displayCategory =
-                    "Disney";
-
+            if (currentRadioData.name.toLowerCase().includes("disney")) {
+                currentRadioData.displayCategory = "Disney";
             }
 
-
-            /*
-             * Garante que nunca fique
-             * uma categoria vazia.
-             */
-
-            if (
-                !currentRadioData.displayCategory ||
-                !currentRadioData.displayCategory.trim()
-            ) {
-
-                currentRadioData.displayCategory =
-                    "Outras";
-
+            if (!currentRadioData.displayCategory || !currentRadioData.displayCategory.trim()) {
+                currentRadioData.displayCategory = "Outras";
             }
 
-
-            radios.push(
-                currentRadioData
-            );
-
-
-            currentRadioData =
-                null;
-
+            radios.push(currentRadioData);
+            currentRadioData = null;
         }
-
     }
-
 }
 
 /* ==========================================
@@ -583,1743 +264,534 @@ function parseM3U(text) {
 ========================================== */
 
 function isFavorite(radio) {
-
-    return favoriteRadios.includes(
-        radio.url
-    );
-
+    return favoriteRadios.includes(radio.url);
 }
-
-
-function saveFavorites() {
-
-    localStorage.setItem(
-        FAVORITES_STORAGE_KEY,
-        JSON.stringify(favoriteRadios)
-    );
-
-}
-
 
 function toggleFavorite(radio) {
-
-    const index =
-        favoriteRadios.indexOf(
-            radio.url
-        );
-
+    const index = favoriteRadios.indexOf(radio.url);
 
     if (index === -1) {
-
-        /*
-         * Rádio ainda não é favorita.
-         * Adiciona aos favoritos.
-         */
-
-        favoriteRadios.push(
-            radio.url
-        );
-
+        favoriteRadios.push(radio.url);
     } else {
-
-        /*
-         * Rádio já é favorita.
-         * Remove dos favoritos.
-         */
-
-        favoriteRadios.splice(
-            index,
-            1
-        );
-
+        favoriteRadios.splice(index, 1);
     }
 
-
-    saveFavorites();
-
-
-    /*
-     * Atualiza a tela mantendo
-     * a pesquisa atual.
-     */
-
-    renderRadios(
-        searchInput.value
-    );
-
+    saveToStorage(STORAGE_KEYS.FAVORITES, favoriteRadios);
+    renderRadios(searchInput.value);
 }
 
 /* ==========================================
-   REGISTRAR RÁDIO COMO OUVIDA RECENTEMENTE
+   HISTÓRICO E RANKING (RECENTES E POPULARES)
 ========================================== */
 
 function addToRecent(radio) {
-
-    /*
-     * Remove a rádio caso ela já esteja
-     * na lista.
-     */
-
-    recentRadios =
-        recentRadios.filter(
-            item =>
-                item.url !== radio.url
-        );
-
-
-    /*
-     * Coloca a rádio atual no início
-     * da lista.
-     */
+    recentRadios = recentRadios.filter(item => item.url !== radio.url);
 
     recentRadios.unshift({
         name: radio.name,
         url: radio.url
     });
 
-
-    /*
-     * Mantém somente as 5 últimas.
-     */
-
-    recentRadios =
-        recentRadios.slice(0, 5);
-
-
-    /*
-     * Salva no navegador.
-     */
-
-    localStorage.setItem(
-        RECENT_STORAGE_KEY,
-        JSON.stringify(recentRadios)
-    );
-
-
+    recentRadios = recentRadios.slice(0, MAX_HISTORY_ITEMS);
+    saveToStorage(STORAGE_KEYS.RECENT, recentRadios);
     renderRecentDropdown();
-
 }
-
-/* ==========================================
-   CONTADOR - RÁDIOS MAIS ESCUTADAS
-========================================== */
 
 function startListeningCounter(radio) {
-
-    /*
-     * Cancela qualquer contador anterior.
-     */
-
     stopListeningCounter();
+    listeningRadio = radio;
 
-
-    listeningRadio =
-        radio;
-
-    /*
-     * Só registra a escuta depois
-     * de 5 minutos.
-     */
-
-    listeningTimer =
-        setTimeout(
-            () => {
-
-                /*
-                 * Só contabiliza se a rádio
-                 * ainda for a rádio atual
-                 * e estiver realmente tocando.
-                 */
-
-                if (
-                    currentRadio &&
-                    currentRadio.url === radio.url &&
-                    !audioPlayer.paused
-                ) {
-
-                    registerRadioListen(
-                        radio
-                    );
-
-                }
-
-            },
-            LISTEN_TIME_REQUIRED
-        );
-
-}
-
-function stopListeningCounter() {
-
-    if (
-        listeningTimer
-    ) {
-
-        clearTimeout(
-            listeningTimer
-        );
-
-    }
-
-
-    listeningTimer =
-        null;
-
-    listeningRadio =
-        null;
-
-}
-
-
-function registerRadioListen(radio) {
-
-    if (!radio) {
-        return;
-    }
-
-
-    const existing =
-        popularRadios.find(
-            item =>
-                item.url === radio.url
-        );
-
-
-    if (existing) {
-
-        existing.count += 1;
-
-    } else {
-
-        popularRadios.push({
-            name: radio.name,
-            url: radio.url,
-            count: 1
-        });
-
-    }
-
-
-    /*
-     * Ordena da mais escutada
-     * para a menos escutada.
-     */
-
-    popularRadios.sort(
-        (a, b) =>
-            b.count - a.count
-    );
-
-
-    /*
-     * Mantém somente as 5 primeiras
-     * no ranking salvo.
-     */
-
-    popularRadios =
-        popularRadios.slice(0, 5);
-
-
-    localStorage.setItem(
-        POPULAR_STORAGE_KEY,
-        JSON.stringify(
-            popularRadios
-        )
-    );
-
-
-    renderPopularDropdown();
-
-
-    /*
-     * Evita que a mesma sessão
-     * seja contabilizada novamente.
-     */
-
-    listeningTimer =
-        null;
-
-}
-
-
-/* ==========================================
-   RENDERIZAR MAIS ESCUTADAS
-========================================== */
-
-function renderPopularDropdown() {
-
-    popularDropdown.innerHTML = "";
-
-
-    if (!popularRadios.length) {
-
-        popularDropdown.innerHTML = `
-            <div class="recent-empty">
-                Nenhuma rádio ranqueada ainda.
-            </div>
-        `;
-
-        return;
-
-    }
-
-
-    popularRadios.forEach(
-        (radio, index) => {
-
-            const item =
-                document.createElement(
-                    "button"
-                );
-
-
-            item.type =
-                "button";
-
-
-            item.className =
-                "recent-item";
-
-
-            item.innerHTML = `
-
-                <span
-                    class="popular-position"
-                >
-                    ${index + 1}º
-                </span>
-
-                <span
-                    class="recent-item-info"
-                >
-
-                    <span
-                        class="recent-item-name"
-                    >
-                        ${escapeHTML(
-                            radio.name
-                        )}
-                    </span>
-
-                    <span
-                        class="recent-item-category"
-                    >
-                        ${radio.count}
-                        ${
-                            radio.count === 1
-                                ? "escuta"
-                                : "escutas"
-                        }
-                    </span>
-
-                </span>
-
-                <span
-                    class="recent-item-play"
-                >
-                    ▶
-                </span>
-
-            `;
-
-
-            item.title =
-                "Tocar " +
-                radio.name;
-
-
-            item.addEventListener(
-                "click",
-                event => {
-
-                    event.stopPropagation();
-
-
-                    const foundRadio =
-                        radios.find(
-                            item =>
-                                item.url === radio.url
-                        );
-
-
-                    if (foundRadio) {
-
-                        playRadio(
-                            foundRadio
-                        );
-
-                    }
-
-
-                    popularDropdown.classList.remove(
-                        "open"
-                    );
-
-
-                    popularButton.setAttribute(
-                        "aria-expanded",
-                        "false"
-                    );
-
-                }
-            );
-
-
-            popularDropdown.appendChild(
-                item
-            );
-
-        }
-    );
-
-}
-
-/* ==========================================
-   RENDERIZAR OUVIDAS RECENTEMENTE
-========================================== */
-
-function renderRecentDropdown() {
-
-    recentDropdown.innerHTML = "";
-
-
-    if (!recentRadios.length) {
-
-        recentDropdown.innerHTML = `
-            <div class="recent-empty">
-                Nenhuma rádio ouvida recentemente.
-            </div>
-        `;
-
-        return;
-
-    }
-
-
-    recentRadios.forEach(
-        radio => {
-
-            const item =
-                document.createElement(
-                    "button"
-                );
-
-
-            item.type =
-                "button";
-
-
-            item.className =
-                "recent-item";
-
-
-            item.textContent =
-                radio.name;
-
-
-            item.title =
-                "Tocar " + radio.name;
-
-
-            item.addEventListener(
-                "click",
-                event => {
-
-                    event.stopPropagation();
-
-
-                    /*
-                     * Procura a rádio atual
-                     * dentro da playlist.
-                     */
-
-                    const foundRadio =
-                        radios.find(
-                            item =>
-                                item.url === radio.url
-                        );
-
-
-                    if (foundRadio) {
-
-                        playRadio(
-                            foundRadio
-                        );
-
-                    }
-
-
-                    /*
-                     * Fecha o dropdown.
-                     */
-
-                    recentDropdown.classList.remove(
-                        "open"
-                    );
-
-
-                    recentButton.setAttribute(
-                        "aria-expanded",
-                        "false"
-                    );
-
-                }
-            );
-
-
-            recentDropdown.appendChild(
-                item
-            );
-
-        }
-    );
-
-}
-
-/* ==========================================
-   RENDERIZAR RÁDIOS
-========================================== */
-
-function renderRadios(
-    filter = ""
-) {
-
-    const query =
-        filter
-            .trim()
-            .toLowerCase();
-
-
-    const filteredRadios =
-        radios.filter(
-            radio => {
-
-                const name =
-                    radio.name
-                        .toLowerCase();
-
-                const category =
-                    (
-                        radio.displayCategory ||
-                        radio.category ||
-                        "Outras"
-                    ).toLowerCase();
-
-
-                return (
-                    name.includes(query) ||
-                    category.includes(query)
-                );
-
-            }
-        );
-
-
-    if (!filteredRadios.length) {
-
-        radioApp.innerHTML = `
-
-            <div class="empty">
-
-                <div class="empty-icon">
-                    🔎
-                </div>
-
-                <div>
-                    Nenhuma rádio encontrada.
-                </div>
-
-            </div>
-
-        `;
-
-        return;
-
-    }
-
-
-    const categories = {};
-
-
-/*
- * Separa as rádios favoritas
- * das demais rádios.
- */
-
-const favoriteList =
-    filteredRadios.filter(
-        radio =>
-            isFavorite(radio)
-    );
-
-
-const normalRadios =
-    filteredRadios;
-
-/*
- * Agrupa somente as rádios
- * normais por categoria.
- */
-
-normalRadios.forEach(
-    radio => {
-
-        const category =
-            radio.displayCategory ||
-            radio.category ||
-            "Outras";
-
-
-        if (
-            !categories[category]
-        ) {
-
-            categories[category] =
-                [];
-
-        }
-
-
-        categories[category].push(
-            radio
-        );
-
-    }
-);
-
-
-radioApp.innerHTML = "";
-
-
-/*
- * As categorias normais continuam
- * usando a ordenação existente.
- */
-
-let categoryEntries =
-    Object.entries(
-        categories
-    );
-
-/*
- * ================================
- * SEÇÃO DE FAVORITOS
- * ================================
- */
-
-if (
-    favoriteList.length > 0
-) {
-
-    const section =
-        document.createElement(
-            "section"
-        );
-
-
-    section.className =
-        "category favorites-category";
-
-
-    section.innerHTML = `
-
-        <div class="category-title">
-
-            <span>
-                ⭐
-            </span>
-
-            <span>
-                Favoritos
-            </span>
-
-            <span
-                class="category-count"
-            >
-                ${favoriteList.length}
-            </span>
-
-        </div>
-
-        <div
-            class="radio-grid"
-        ></div>
-
-    `;
-
-
-    const grid =
-        section.querySelector(
-            ".radio-grid"
-        );
-
-
-    favoriteList.forEach(
-        radio => {
-
-            const card =
-                createRadioCard(
-                    radio
-                );
-
-
-            grid.appendChild(
-                card
-            );
-
-        }
-    );
-
-
-    radioApp.appendChild(
-        section
-    );
-
-}
-
-
-
-
-/*
- * Ordenação das categorias.
- *
- * "original" mantém a ordem em que
- * as categorias apareceram no arquivo M3U.
- */
-
-if (currentSort === "az") {
-
-    categoryEntries.sort(
-        (a, b) =>
-            a[0].localeCompare(
-                b[0],
-                "pt-BR",
-                {
-                    sensitivity: "base"
-                }
-            )
-    );
-
-}
-
-
-if (currentSort === "za") {
-
-    categoryEntries.sort(
-        (a, b) =>
-            b[0].localeCompare(
-                a[0],
-                "pt-BR",
-                {
-                    sensitivity: "base"
-                }
-            )
-    );
-
-}
-
-
-categoryEntries.forEach(
-    (
-        [
-            category,
-            categoryRadios
-        ]
-    ) => {
-
-                const section =
-                    document.createElement(
-                        "section"
-                    );
-
-
-                section.className =
-                    "category";
-
-
-                const icon =
-                    categoryIcons[
-                        category
-                    ] || "🌎";
-
-
-                section.innerHTML = `
-
-                    <div class="category-title">
-
-                        <span>
-                            ${icon}
-                        </span>
-
-                        <span>
-                            ${escapeHTML(
-                                category
-                            )}
-                        </span>
-
-                        <span
-                            class="category-count"
-                        >
-                            ${categoryRadios.length}
-                        </span>
-
-                    </div>
-
-                    <div
-                        class="radio-grid"
-                    ></div>
-
-                `;
-
-
-                const grid =
-                    section.querySelector(
-                        ".radio-grid"
-                    );
-
-
-                categoryRadios.forEach(
-                    radio => {
-
-                        const card =
-                            createRadioCard(
-                                radio
-                            );
-
-
-                        grid.appendChild(
-                            card
-                        );
-
-                    }
-                );
-
-
-                radioApp.appendChild(
-                    section
-                );
-
-            }
-        );
-
-}
-
-
-/* ==========================================
-   CRIAR CARD DA RÁDIO
-========================================== */
-
-function createRadioCard(
-    radio
-) {
-
-    const card =
-        document.createElement(
-            "div"
-        );
-
-
-    card.className =
-        "radio-card";
-
-
-    if (
-        currentRadio &&
-        currentRadio.url === radio.url
-    ) {
-
-        card.classList.add(
-            "active"
-        );
-
-    }
-
-    const isCurrent =
-        currentRadio &&
-        currentRadio.url === radio.url &&
-        !audioPlayer.paused;
-
-    card.innerHTML = `
-
-    <div class="radio-icon">
-        📻
-    </div>
-
-    <div class="radio-name">
-        ${escapeHTML(
-            radio.name
-        )}
-    </div>
-
-    ${
-    isCurrent
-        ? `
-            <div class="radio-live">
-                <span class="radio-live-dot"></span>
-                AO VIVO
-            </div>
-        `
-        : ""
-    }
-
-    <div class="radio-country">
-        ${escapeHTML(
-            radio.displayCategory ||
-            radio.category ||
-            "Outras"
-        )}
-    </div>
-
-    <button
-        class="radio-favorite ${isFavorite(radio) ? "favorited" : ""}"
-        type="button"
-        title="${
-            isFavorite(radio)
-                ? "Desfavoritar rádio"
-                : "Favoritar rádio"
-        }"
-        aria-label="${
-            isFavorite(radio)
-                ? "Desfavoritar rádio"
-                : "Favoritar rádio"
-        }"
-    >
-        ${
-            isFavorite(radio)
-                ? "★"
-                : "☆"
-        }
-    </button>
-
-    <button
-        class="radio-play"
-        type="button"
-        title="Tocar rádio"
-    >
-        ${isCurrent ? "⏹" : "▶"}
-    </button>
-
-`;
-
-
-
-    /*
-     * Evita que o clique no botão
-     * seja tratado duas vezes.
-     */
-
-    const button =
-        card.querySelector(
-            ".radio-play"
-        );
-
-
-    button.addEventListener(
-    "click",
-    event => {
-
-        event.stopPropagation();
-
-
-        /*
-         * Se esta rádio é a que está tocando,
-         * o botão do card funciona como PARAR.
-         */
-
+    listeningTimer = setTimeout(() => {
         if (
             currentRadio &&
             currentRadio.url === radio.url &&
             !audioPlayer.paused
         ) {
-
-            audioPlayer.pause();
-
-            stopListeningCounter();
-
-            /*
-             * Remove completamente a conexão
-             * com o stream atual.
-             */
-
-            audioPlayer.removeAttribute(
-                "src"
-            );
-
-            audioPlayer.load();
-
-
-            /*
-             * Volta o player para o estado inicial.
-             */
-
-            currentRadio = null;
-
-            currentStation.textContent =
-                "Nenhuma rádio selecionada";
-
-            playPauseButton.textContent =
-                "▶";
-
-            playerStatus.textContent =
-                "Escolha uma rádio para começar.";
-
-
-            renderRadios(
-                searchInput.value
-            );
-
-
-            return;
-
+            registerRadioListen(radio);
         }
-
-
-        /*
-         * Caso contrário, toca a rádio normalmente.
-         */
-
-        playRadio(
-            radio
-        );
-
-    }
-);
-
-
-    const favoriteButton =
-    card.querySelector(
-        ".radio-favorite"
-    );
-
-
-favoriteButton.addEventListener(
-    "click",
-    event => {
-
-        /*
-         * Impede que o clique na estrela
-         * também toque a rádio.
-         */
-
-        event.stopPropagation();
-
-
-        toggleFavorite(
-            radio
-        );
-
-    }
-);
-
-
-    return card;
-
+    }, LISTEN_TIME_REQUIRED);
 }
 
+function stopListeningCounter() {
+    if (listeningTimer) {
+        clearTimeout(listeningTimer);
+    }
+    listeningTimer = null;
+    listeningRadio = null;
+}
+
+function registerRadioListen(radio) {
+    if (!radio) return;
+
+    const existing = popularRadios.find(item => item.url === radio.url);
+
+    if (existing) {
+        existing.count += 1;
+    } else {
+        popularRadios.push({
+            name: radio.name,
+            url: radio.url,
+            count: 1
+        });
+    }
+
+    popularRadios.sort((a, b) => b.count - a.count);
+    popularRadios = popularRadios.slice(0, MAX_HISTORY_ITEMS);
+
+    saveToStorage(STORAGE_KEYS.POPULAR, popularRadios);
+    renderPopularDropdown();
+
+    listeningTimer = null;
+}
 
 /* ==========================================
-   TOCAR RÁDIO
+   RENDERIZAÇÃO DOS DROPDOWNS
 ========================================== */
 
-async function playRadio(
-    radio
-) {
+function renderPopularDropdown() {
+    popularDropdown.innerHTML = "";
 
+    if (!popularRadios.length) {
+        popularDropdown.innerHTML = `
+            <div class="recent-empty">
+                Nenhuma rádio ranqueada ainda.
+            </div>
+        `;
+        return;
+    }
+
+    popularRadios.forEach((radio, index) => {
+        const item = document.createElement("button");
+        item.type = "button";
+        item.className = "recent-item";
+        item.title = `Tocar ${radio.name}`;
+
+        const listenLabel = radio.count === 1 ? "escuta" : "escutas";
+
+        item.innerHTML = `
+            <span class="popular-position">${index + 1}º</span>
+            <span class="recent-item-info">
+                <span class="recent-item-name">${escapeHTML(radio.name)}</span>
+                <span class="recent-item-category">${radio.count} ${listenLabel}</span>
+            </span>
+            <span class="recent-item-play">▶</span>
+        `;
+
+        item.addEventListener("click", event => {
+            event.stopPropagation();
+
+            const foundRadio = radios.find(r => r.url === radio.url);
+            if (foundRadio) {
+                playRadio(foundRadio);
+            }
+
+            closeAllDropdowns();
+        });
+
+        popularDropdown.appendChild(item);
+    });
+}
+
+function renderRecentDropdown() {
+    recentDropdown.innerHTML = "";
+
+    if (!recentRadios.length) {
+        recentDropdown.innerHTML = `
+            <div class="recent-empty">
+                Nenhuma rádio ouvida recentemente.
+            </div>
+        `;
+        return;
+    }
+
+    recentRadios.forEach(radio => {
+        const item = document.createElement("button");
+        item.type = "button";
+        item.className = "recent-item";
+        item.textContent = radio.name;
+        item.title = `Tocar ${radio.name}`;
+
+        item.addEventListener("click", event => {
+            event.stopPropagation();
+
+            const foundRadio = radios.find(r => r.url === radio.url);
+            if (foundRadio) {
+                playRadio(foundRadio);
+            }
+
+            closeAllDropdowns();
+        });
+
+        recentDropdown.appendChild(item);
+    });
+}
+
+/* ==========================================
+   RENDERIZAÇÃO PRINCIPAL (CATEGORIAS E CARDS)
+========================================== */
+
+function renderRadios(filter = "") {
+    const query = filter.trim().toLowerCase();
+
+    const filteredRadios = radios.filter(radio => {
+        const name = radio.name.toLowerCase();
+        const category = (radio.displayCategory || radio.category || "Outras").toLowerCase();
+        return name.includes(query) || category.includes(query);
+    });
+
+    if (!filteredRadios.length) {
+        radioApp.innerHTML = `
+            <div class="empty">
+                <div class="empty-icon">🔎</div>
+                <div>Nenhuma rádio encontrada.</div>
+            </div>
+        `;
+        return;
+    }
+
+    const favoriteList = filteredRadios.filter(radio => isFavorite(radio));
+    const categories = {};
+
+    filteredRadios.forEach(radio => {
+        const category = radio.displayCategory || radio.category || "Outras";
+        if (!categories[category]) {
+            categories[category] = [];
+        }
+        categories[category].push(radio);
+    });
+
+    radioApp.innerHTML = "";
+
+    // Seção de Favoritos
+    if (favoriteList.length > 0) {
+        const favSection = createCategorySection("Favoritos", "⭐", favoriteList, "favorites-category");
+        radioApp.appendChild(favSection);
+    }
+
+    // Ordenação das Categorias
+    const categoryEntries = Object.entries(categories);
+
+    if (currentSort === "az") {
+        categoryEntries.sort((a, b) =>
+            a[0].localeCompare(b[0], "pt-BR", { sensitivity: "base" })
+        );
+    } else if (currentSort === "za") {
+        categoryEntries.sort((a, b) =>
+            b[0].localeCompare(a[0], "pt-BR", { sensitivity: "base" })
+        );
+    }
+
+    // Seções de Categorias
+    categoryEntries.forEach(([category, categoryRadios]) => {
+        const icon = CATEGORY_ICONS[category] || "🌎";
+        const section = createCategorySection(escapeHTML(category), icon, categoryRadios);
+        radioApp.appendChild(section);
+    });
+}
+
+function createCategorySection(titleHTML, iconHTML, radioList, extraClass = "") {
+    const section = document.createElement("section");
+    section.className = `category ${extraClass}`.trim();
+
+    section.innerHTML = `
+        <div class="category-title">
+            <span>${iconHTML}</span>
+            <span>${titleHTML}</span>
+            <span class="category-count">${radioList.length}</span>
+        </div>
+        <div class="radio-grid"></div>
+    `;
+
+    const grid = section.querySelector(".radio-grid");
+    radioList.forEach(radio => {
+        grid.appendChild(createRadioCard(radio));
+    });
+
+    return section;
+}
+
+function createRadioCard(radio) {
+    const card = document.createElement("div");
+    card.className = "radio-card";
+
+    const isSelected = currentRadio && currentRadio.url === radio.url;
+    const isPlaying = isSelected && !audioPlayer.paused;
+    const favorited = isFavorite(radio);
+
+    if (isSelected) {
+        card.classList.add("active");
+    }
+
+    const favTitle = favorited ? "Desfavoritar rádio" : "Favoritar rádio";
+    const categoryName = radio.displayCategory || radio.category || "Outras";
+
+    card.innerHTML = `
+        <div class="radio-icon">📻</div>
+        <div class="radio-name">${escapeHTML(radio.name)}</div>
+        ${isPlaying ? `
+            <div class="radio-live">
+                <span class="radio-live-dot"></span>
+                AO VIVO
+            </div>
+        ` : ""}
+        <div class="radio-country">${escapeHTML(categoryName)}</div>
+        <button
+            class="radio-favorite ${favorited ? "favorited" : ""}"
+            type="button"
+            title="${favTitle}"
+            aria-label="${favTitle}"
+        >
+            ${favorited ? "★" : "☆"}
+        </button>
+        <button
+            class="radio-play"
+            type="button"
+            title="Tocar rádio"
+        >
+            ${isPlaying ? "⏹" : "▶"}
+        </button>
+    `;
+
+    const playBtn = card.querySelector(".radio-play");
+    playBtn.addEventListener("click", event => {
+        event.stopPropagation();
+
+        if (currentRadio && currentRadio.url === radio.url && !audioPlayer.paused) {
+            stopRadio();
+            return;
+        }
+
+        playRadio(radio);
+    });
+
+    const favoriteBtn = card.querySelector(".radio-favorite");
+    favoriteBtn.addEventListener("click", event => {
+        event.stopPropagation();
+        toggleFavorite(radio);
+    });
+
+    return card;
+}
+
+/* ==========================================
+   CONTROLE DE REPRODUÇÃO (PLAY / STOP)
+========================================== */
+
+async function playRadio(radio) {
     try {
-
-        /*
-         * Encerra imediatamente qualquer
-         * contador da rádio anterior.
-         */
-
         stopListeningCounter();
 
+        currentRadio = radio;
+        currentStation.textContent = radio.name;
+        playerStatus.textContent = "Conectando...";
+        playPauseButton.textContent = "⏳";
 
-        /*
-         * Define a nova rádio atual.
-         */
-
-        currentRadio =
-            radio;
-
-
-        currentStation.textContent =
-            radio.name;
-
-
-        playerStatus.textContent =
-            "Conectando...";
-
-
-        playPauseButton.textContent =
-            "⏳";
-
-
-        /*
-         * Define a URL do novo stream.
-         */
-
-        audioPlayer.src =
-            radio.url;
-
-
+        audioPlayer.src = radio.url;
         audioPlayer.load();
-
-
-        /*
-         * Inicia a nova conexão.
-         */
 
         await audioPlayer.play();
 
+        addToRecent(radio);
+        startListeningCounter(radio);
 
-        addToRecent(
-            radio
-        );
+        playPauseButton.textContent = "⏹";
+        playerStatus.innerHTML = LIVE_BADGE_HTML;
 
-
-        startListeningCounter(
-            radio
-        );
-
-
-        playPauseButton.textContent =
-            "⏹";
-
-
-        playerStatus.innerHTML = `
-            <span class="player-live">
-                <span class="radio-live-dot"></span>
-                AO VIVO
-            </span>
-        `;
-
-
-        renderRadios(
-            searchInput.value
-        );
-
-
+        renderRadios(searchInput.value);
     } catch (error) {
+        console.error("Erro ao reproduzir:", error);
 
-        console.error(
-            "Erro ao reproduzir:",
-            error
-        );
+        playPauseButton.textContent = "▶";
+        playerStatus.textContent = "Não foi possível reproduzir esta rádio no navegador.";
 
-
-        playPauseButton.textContent =
-            "▶";
-
-
-        playerStatus.textContent =
-            "Não foi possível reproduzir esta rádio no navegador.";
-
-
-        renderRadios(
-            searchInput.value
-        );
-
+        renderRadios(searchInput.value);
     }
-
 }
 
+function stopRadio(statusMessage = "Escolha uma rádio para começar.") {
+    audioPlayer.pause();
+    stopListeningCounter();
+
+    audioPlayer.removeAttribute("src");
+    audioPlayer.load();
+
+    currentRadio = null;
+    currentStation.textContent = "Nenhuma rádio selecionada";
+    playPauseButton.textContent = "▶";
+    playerStatus.textContent = statusMessage;
+
+    renderRadios(searchInput.value);
+}
+
+playPauseButton.addEventListener("click", async () => {
+    if (!currentRadio) {
+        playerStatus.textContent = "Escolha uma rádio primeiro.";
+        return;
+    }
+
+    if (!audioPlayer.paused) {
+        stopRadio();
+        return;
+    }
+
+    try {
+        playerStatus.textContent = "Conectando...";
+        playPauseButton.textContent = "⏳";
+
+        audioPlayer.src = currentRadio.url;
+        audioPlayer.load();
+
+        await audioPlayer.play();
+        startListeningCounter(currentRadio);
+
+        playPauseButton.textContent = "⏹";
+        playerStatus.innerHTML = LIVE_BADGE_HTML;
+
+        renderRadios(searchInput.value);
+    } catch (error) {
+        console.error("Erro ao iniciar rádio:", error);
+        playPauseButton.textContent = "▶";
+        playerStatus.textContent = "Não foi possível iniciar a rádio.";
+    }
+});
+
 /* ==========================================
-   PLAY / PARAR
+   CONTROLE DE VOLUME E MUDO
 ========================================== */
 
-playPauseButton.addEventListener(
-    "click",
-    async () => {
+function applyVolume(volume, persist = true) {
+    const clampedVolume = Math.max(0, Math.min(1, Number(volume)));
 
-        /*
-         * Nenhuma rádio escolhida.
-         */
+    audioPlayer.volume = clampedVolume;
+    volumeControl.value = clampedVolume;
+    volumeValue.textContent = Math.round(clampedVolume * 100);
 
-        if (!currentRadio) {
-
-            playerStatus.textContent =
-                "Escolha uma rádio primeiro.";
-
-            return;
-
-        }
-
-
-        /*
-         * Se estiver tocando,
-         * o botão agora funciona como PARAR.
-         */
-
-        if (!audioPlayer.paused) {
-
-            audioPlayer.pause();
-
-            stopListeningCounter();
-
-            /*
-            * Remove completamente a conexão
-            * com o stream atual.
-            */
-
-            audioPlayer.removeAttribute(
-                "src"
-            );
-
-            audioPlayer.load();
-
-            /*
-            * Limpa a rádio atualmente selecionada.
-            */
-
-            currentRadio = null;
-
-            currentStation.textContent =
-                "Nenhuma rádio selecionada";
-            
-            playPauseButton.textContent =
-                "▶";
-            
-            playerStatus.textContent =
-                "Escolha uma rádio para começar.";
-            
-            renderRadios(
-                searchInput.value
-            );
-            
-            return;
-
-
-        }
-
-
-        /*
-         * Se estiver parado,
-         * inicia uma NOVA conexão
-         * com a rádio atual.
-         *
-         * Isso faz o usuário voltar
-         * para o ponto atual da transmissão.
-         */
-
-        try {
-
-            playerStatus.textContent =
-                "Conectando...";
-
-
-            playPauseButton.textContent =
-                "⏳";
-
-
-            audioPlayer.src =
-                currentRadio.url;
-
-
-            audioPlayer.load();
-
-
-            await audioPlayer.play();
-
-            startListeningCounter(
-                currentRadio
-            );
-
-
-            playPauseButton.textContent =
-                "⏹";
-
-
-            playerStatus.innerHTML = `
-                <span class="radio-live">
-                    <span class="radio-live-dot"></span>
-                    AO VIVO
-                </span>
-            `;
-
-
-            renderRadios(
-                searchInput.value
-            );
-
-
-        } catch (error) {
-
-            console.error(
-                "Erro ao iniciar rádio:",
-                error
-            );
-
-
-            playPauseButton.textContent =
-                "▶";
-
-
-            playerStatus.textContent =
-                "Não foi possível iniciar a rádio.";
-
-        }
-
+    if (persist) {
+        saveToStorage(STORAGE_KEYS.VOLUME, clampedVolume);
     }
-);
 
+    if (clampedVolume > 0) {
+        previousVolume = clampedVolume;
+        muteButton.textContent = "🔊";
+        muteButton.setAttribute("aria-label", "Mutar");
+        muteButton.setAttribute("title", "Mutar");
+    } else {
+        muteButton.textContent = "🔇";
+        muteButton.setAttribute("aria-label", "Ativar som");
+        muteButton.setAttribute("title", "Ativar som");
+    }
+}
+
+volumeControl.addEventListener("input", () => {
+    applyVolume(volumeControl.value);
+});
+
+muteButton.addEventListener("click", () => {
+    if (audioPlayer.volume > 0) {
+        previousVolume = audioPlayer.volume;
+        applyVolume(0);
+    } else {
+        const restoredVolume = previousVolume > 0 ? previousVolume : 0.8;
+        applyVolume(restoredVolume);
+    }
+});
 
 /* ==========================================
-   CONTROLE DE VOLUME
+   DROPDOWNS, PESQUISA E ORDENAÇÃO
 ========================================== */
 
-volumeControl.addEventListener(
-    "input",
-    () => {
+function toggleDropdown(button, dropdown, otherButton, otherDropdown) {
+    const isOpen = dropdown.classList.contains("open");
 
-        const volume =
-            Number(volumeControl.value);
+    otherDropdown.classList.remove("open");
+    otherButton.setAttribute("aria-expanded", "false");
 
-        audioPlayer.volume =
-            volume;
-
-        volumeValue.textContent =
-            Math.round(
-                volume * 100
-            );
-
-        localStorage.setItem(
-            VOLUME_STORAGE_KEY,
-            volume
-        );
-
-        
-        if (volume > 0) {
-
-            previousVolume =
-                volume;
-
-            muteButton.textContent =
-                "🔊";
-
-            muteButton.setAttribute(
-                "aria-label",
-                "Mutar"
-            );
-
-            muteButton.setAttribute(
-                "title",
-                "Mutar"
-            );
-
-        } else {
-
-            muteButton.textContent =
-                "🔇";
-
-            muteButton.setAttribute(
-                "aria-label",
-                "Ativar som"
-            );
-
-            muteButton.setAttribute(
-                "title",
-                "Ativar som"
-            );
-
-        }
-
+    if (isOpen) {
+        dropdown.classList.remove("open");
+        button.setAttribute("aria-expanded", "false");
+    } else {
+        dropdown.classList.add("open");
+        button.setAttribute("aria-expanded", "true");
     }
-);
+}
 
+function closeAllDropdowns() {
+    recentDropdown.classList.remove("open");
+    recentButton.setAttribute("aria-expanded", "false");
+
+    popularDropdown.classList.remove("open");
+    popularButton.setAttribute("aria-expanded", "false");
+}
+
+recentButton.addEventListener("click", event => {
+    event.stopPropagation();
+    toggleDropdown(recentButton, recentDropdown, popularButton, popularDropdown);
+});
+
+popularButton.addEventListener("click", event => {
+    event.stopPropagation();
+    toggleDropdown(popularButton, popularDropdown, recentButton, recentDropdown);
+});
+
+document.addEventListener("click", event => {
+    if (!event.target.closest(".recent-box") && !event.target.closest(".popular-box")) {
+        closeAllDropdowns();
+    }
+});
+
+searchInput.addEventListener("input", () => {
+    renderRadios(searchInput.value);
+});
+
+sortSelect.addEventListener("change", () => {
+    currentSort = sortSelect.value;
+    renderRadios(searchInput.value);
+});
 
 /* ==========================================
-   MUTAR / DESMUTAR
+   EVENTOS DO ELEMENTO DE ÁUDIO
 ========================================== */
 
-muteButton.addEventListener(
-    "click",
-    () => {
+audioPlayer.addEventListener("playing", () => {
+    playPauseButton.textContent = "⏹";
+    playerStatus.innerHTML = LIVE_BADGE_HTML;
+    renderRadios(searchInput.value);
+});
 
-        if (audioPlayer.volume > 0) {
-
-            previousVolume =
-                audioPlayer.volume;
-
-            audioPlayer.volume =
-                0;
-
-            volumeControl.value =
-                0;
-
-            volumeValue.textContent =
-                "0";
-
-            localStorage.setItem(
-                VOLUME_STORAGE_KEY,
-                0
-            );
-
-            muteButton.textContent =
-                "🔇";
-
-            muteButton.setAttribute(
-                "aria-label",
-                "Ativar som"
-            );
-
-            muteButton.setAttribute(
-                "title",
-                "Ativar som"
-            );
-
-        } else {
-
-            const volume =
-                previousVolume > 0
-                    ? previousVolume
-                    : 0.8;
-
-            audioPlayer.volume =
-                volume;
-
-            volumeControl.value =
-                volume;
-
-            volumeValue.textContent =
-                Math.round(
-                    volume * 100
-                );
-
-            localStorage.setItem(
-                VOLUME_STORAGE_KEY,
-                volume
-            );
-
-
-            muteButton.textContent =
-                "🔊";
-
-            muteButton.setAttribute(
-                "aria-label",
-                "Mutar"
-            );
-
-            muteButton.setAttribute(
-                "title",
-                "Mutar"
-            );
-
-        }
-
+audioPlayer.addEventListener("waiting", () => {
+    if (currentRadio) {
+        playerStatus.textContent = "Bufferizando...";
     }
-);
+});
+
+audioPlayer.addEventListener("error", () => {
+    stopListeningCounter();
+    playPauseButton.textContent = "▶";
+    playerStatus.textContent = "Erro ao acessar o stream.";
+    currentRadio = null;
+    currentStation.textContent = "Nenhuma rádio selecionada";
+    renderRadios(searchInput.value);
+});
 
 /* ==========================================
-   OUVIDAS RECENTEMENTE
-========================================== */
-
-recentButton.addEventListener(
-    "click",
-    event => {
-
-        event.stopPropagation();
-
-        const isOpen =
-            recentDropdown.classList.contains(
-                "open"
-            );
-
-
-        if (isOpen) {
-
-            recentDropdown.classList.remove(
-                "open"
-            );
-
-            recentButton.setAttribute(
-                "aria-expanded",
-                "false"
-            );
-
-            return;
-
-        }
-
-
-        recentDropdown.classList.add(
-            "open"
-        );
-
-        recentButton.setAttribute(
-            "aria-expanded",
-            "true"
-        );
-
-    }
-);
-
-
-/*
- * Fecha o dropdown quando o usuário
- * clicar fora dele.
- */
-
-document.addEventListener(
-    "click",
-    event => {
-
-        if (
-            !event.target.closest(
-                ".recent-box"
-            )
-        ) {
-
-            recentDropdown.classList.remove(
-                "open"
-            );
-
-            recentButton.setAttribute(
-                "aria-expanded",
-                "false"
-            );
-
-        }
-
-    }
-);
-
-/* ==========================================
-   MAIS ESCUTADAS
-========================================== */
-
-popularButton.addEventListener(
-    "click",
-    event => {
-
-        event.stopPropagation();
-
-        const isOpen =
-            popularDropdown.classList.contains(
-                "open"
-            );
-
-
-        if (isOpen) {
-
-            popularDropdown.classList.remove(
-                "open"
-            );
-
-            popularButton.setAttribute(
-                "aria-expanded",
-                "false"
-            );
-
-            return;
-
-        }
-
-
-        popularDropdown.classList.add(
-            "open"
-        );
-
-        popularButton.setAttribute(
-            "aria-expanded",
-            "true"
-        );
-
-    }
-);
-
-/* ==========================================
-   PESQUISA
-========================================== */
-
-searchInput.addEventListener(
-    "input",
-    () => {
-
-        renderRadios(
-            searchInput.value
-        );
-
-    }
-);
-
-/* ==========================================
-   ORDENAÇÃO
-========================================== */
-
-sortSelect.addEventListener(
-    "change",
-    () => {
-
-        currentSort =
-            sortSelect.value;
-
-        renderRadios(
-            searchInput.value
-        );
-
-    }
-);
-
-
-
-/* ==========================================
-   EVENTOS DO PLAYER
-========================================== */
-
-audioPlayer.addEventListener(
-    "playing",
-    () => {
-
-        playPauseButton.textContent =
-            "⏹";
-
-
-        playerStatus.innerHTML = `
-            <span class="player-live">
-                <span class="radio-live-dot"></span>
-                AO VIVO
-            </span>
-        `;
-
-        renderRadios(
-            searchInput.value
-        );
-
-    }
-);
-
-audioPlayer.addEventListener(
-    "waiting",
-    () => {
-
-        if (
-            currentRadio
-        ) {
-
-            playerStatus.textContent =
-                "Bufferizando...";
-
-        }
-
-    }
-);
-
-
-audioPlayer.addEventListener(
-    "error",
-    () => {
-
-        stopListeningCounter();
-
-        playPauseButton.textContent =
-            "▶";
-
-        playerStatus.textContent =
-            "Erro ao acessar o stream.";
-
-        currentRadio = null;
-
-        currentStation.textContent =
-            "Nenhuma rádio selecionada";
-
-        renderRadios(
-            searchInput.value
-        );
-
-    }
-);
-
-
-/* ==========================================
-   LOADING
+   TELAS DE ESTADO (LOADING / ERRO)
 ========================================== */
 
 function showLoading() {
-
     radioApp.innerHTML = `
-
         <div class="loading">
-
-            <div class="loading-icon">
-                📻
-            </div>
-
-            <p>
-                Carregando suas rádios...
-            </p>
-
+            <div class="loading-icon">📻</div>
+            <p>Carregando suas rádios...</p>
         </div>
-
     `;
-
 }
-
-
-/* ==========================================
-   ERRO
-========================================== */
 
 function showError() {
-
     radioApp.innerHTML = `
-
         <div class="empty">
-
-            <div class="empty-icon">
-                ⚠️
-            </div>
-
-            <div>
-                Não foi possível carregar
-                a playlist.
-            </div>
-
-            <p>
-                Verifique sua conexão
-                e tente novamente.
-            </p>
-
+            <div class="empty-icon">⚠️</div>
+            <div>Não foi possível carregar a playlist.</div>
+            <p>Verifique sua conexão e tente novamente.</p>
         </div>
-
     `;
-
-}
-
-
-/* ==========================================
-   PROTEGER TEXTO HTML
-========================================== */
-
-function escapeHTML(
-    value
-) {
-
-    return String(value)
-
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-
-        .replace(
-            /</g,
-            "&lt;"
-        )
-
-        .replace(
-            />/g,
-            "&gt;"
-        )
-
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-
-        .replace(
-            /'/g,
-            "&#039;"
-        );
-
 }
