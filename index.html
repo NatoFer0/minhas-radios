@@ -3,10 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="googlebot" content="noindex, nofollow">
 
     <title>Minhas Rádios</title>
 
     <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
 </head>
 
 <body>
@@ -23,9 +26,8 @@
             ☀️
         </button>
 
-
         <div class="brand">
-            <div class="brand-icon">📻</div>
+            <div class="brand-icon" aria-hidden="true">📻</div>
 
             <div>
                 <h1>Minhas Rádios</h1>
@@ -34,12 +36,13 @@
         </div>
 
         <div class="search-box">
-            <span>🔎</span>
+            <span aria-hidden="true">🔎</span>
 
             <input
                 type="search"
                 id="searchInput"
                 placeholder="Buscar uma rádio..."
+                aria-label="Buscar uma rádio"
                 autocomplete="off"
             >
         </div>
@@ -54,84 +57,78 @@
                     type="button"
                     aria-expanded="false"
                     aria-haspopup="true"
+                    aria-controls="popularDropdown"
                 >
-                    🔥
+                    <span aria-hidden="true">🔥</span>
                     <span>Mais escutadas</span>
                 </button>
-            
+
                 <div
                     id="popularDropdown"
                     class="popular-dropdown"
-                >
-                </div>
-            
+                ></div>
+
             </div>
 
             <div class="recent-box">
-        
+
                 <button
                     id="recentButton"
                     class="recent-button"
                     type="button"
                     aria-expanded="false"
                     aria-haspopup="true"
+                    aria-controls="recentDropdown"
                 >
-                    ↻
+                    <span aria-hidden="true">↻</span>
                     <span>Ouvidas recentemente</span>
                 </button>
-        
+
                 <div
                     id="recentDropdown"
                     class="recent-dropdown"
-                >
-                </div>
-        
+                ></div>
+
             </div>
 
             <div class="sort-box">
-        
+
                 <label for="sortSelect">
                     Ordenar sessões
                 </label>
-        
+
                 <select id="sortSelect">
-        
                     <option value="original">
                         📄 Ordem original
                     </option>
-        
                     <option value="az">
                         🔤 A → Z
                     </option>
-        
                     <option value="za">
                         🔤 Z → A
                     </option>
-        
                 </select>
-        
-            </div>
-</div>
 
+            </div>
+
+        </div>
 
     </header>
-
 
     <main id="radioApp">
 
         <div class="loading">
-            <div class="loading-icon">📻</div>
+            <div class="loading-icon" aria-hidden="true">📻</div>
             <p>Carregando suas rádios...</p>
         </div>
 
     </main>
 
-
     <footer class="player">
 
         <div class="player-inner">
 
-            <div class="player-station-icon">
+            <div class="player-station-icon" aria-hidden="true">
                 🎵
             </div>
 
@@ -144,6 +141,7 @@
                 <div
                     id="currentStation"
                     class="player-station"
+                    aria-live="polite"
                 >
                     Nenhuma rádio selecionada
                 </div>
@@ -151,12 +149,12 @@
                 <div
                     id="playerStatus"
                     class="player-status"
+                    aria-live="polite"
                 >
                     Escolha uma rádio para começar
                 </div>
 
             </div>
-
 
             <div class="player-controls">
 
@@ -164,13 +162,13 @@
                     id="playPauseButton"
                     class="play-button"
                     type="button"
+                    aria-label="Reproduzir"
                     title="Reproduzir"
                 >
                     ▶
                 </button>
 
             </div>
-
 
             <div class="volume-control">
 
@@ -182,7 +180,7 @@
                 >
                     🔊
                 </button>
-            
+
                 <input
                     id="volumeControl"
                     type="range"
@@ -199,22 +197,17 @@
                 >
                     80
                 </span>
-            
-            </div>
 
+            </div>
 
         </div>
 
     </footer>
 
-
     <audio
         id="audioPlayer"
         preload="none"
     ></audio>
-
-
-    <script src="script.js"></script>
 
 </body>
 </html>
