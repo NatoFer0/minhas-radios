@@ -579,6 +579,10 @@ body {
     font-size: 12px;
 }
 
+/* ================================
+   PLAY BUTTON
+================================ */
+
 .radio-play {
     position: absolute;
     right: 14px;
@@ -589,18 +593,29 @@ body {
     align-items: center;
     justify-content: center;
     border: none;
+    outline: none;
     border-radius: 50%;
     color: white;
     background: var(--accent);
     cursor: pointer;
     font-size: 14px;
     box-shadow: 0 5px 15px rgba(124, 92, 255, 0.25);
+    -webkit-tap-highlight-color: transparent;
     transition: transform 0.15s, background 0.15s;
 }
 
 .radio-play:hover {
     transform: scale(1.08);
     background: var(--accent-light);
+}
+
+.radio-play:focus {
+    outline: none;
+    box-shadow: 0 5px 15px rgba(124, 92, 255, 0.25);
+}
+
+.radio-play:active {
+    transform: scale(0.95);
 }
 
 /* ================================
