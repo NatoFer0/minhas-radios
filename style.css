@@ -249,9 +249,10 @@ body {
 
 .toolbar {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: flex-end;
-    gap: 18px;
+    gap: 12px 18px;
     margin-top: 12px;
 }
 
@@ -276,6 +277,7 @@ body {
     font-size: 12px;
     font-weight: 600;
     cursor: pointer;
+    white-space: nowrap;
     transition: color 0.2s ease, background 0.2s ease;
 }
 
@@ -429,6 +431,7 @@ body {
     color: var(--text-muted);
     font-size: 12px;
     font-weight: 600;
+    white-space: nowrap;
 }
 
 .sort-box select {
@@ -947,31 +950,62 @@ body {
         font-size: 12px;
     }
 
+    /* TOOLBAR — quebra em linhas no mobile */
     .toolbar {
-        justify-content: space-between;
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: flex-start;
         gap: 10px;
+        margin-top: 14px;
+    }
+
+    .popular-box,
+    .recent-box {
+        width: 100%;
     }
 
     .popular-button,
     .recent-button {
-        padding: 0 9px;
+        width: 100%;
+        justify-content: flex-start;
+        height: 42px;
+        padding: 0 14px;
+        font-size: 13px;
+        background: rgba(255, 255, 255, 0.045);
+        border: 1px solid var(--border);
+        border-radius: 12px;
     }
 
+    .popular-button[aria-expanded="true"],
+    .recent-button[aria-expanded="true"] {
+        background: rgba(124, 92, 255, 0.14);
+        border-color: rgba(124, 92, 255, 0.4);
+    }
+
+    /* Dropdown ocupa a largura do botão-pai */
     .popular-dropdown,
     .recent-dropdown {
         left: 0;
         right: auto;
-        width: min(280px, calc(100vw - 28px));
+        width: 100%;
     }
 
+    /* Ordenação em linha, ocupando toda a largura */
     .sort-box {
+        width: 100%;
         justify-content: space-between;
-        margin-top: 10px;
+        margin-top: 2px;
+    }
+
+    .sort-box label {
+        font-size: 13px;
     }
 
     .sort-box select {
         flex: 1;
-        max-width: 190px;
+        max-width: none;
+        height: 42px;
+        font-size: 13px;
     }
 
     .radio-grid {
