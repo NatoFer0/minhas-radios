@@ -82,6 +82,7 @@ const recentDropdown = document.getElementById("recentDropdown");
 const popularButton = document.getElementById("popularButton");
 const popularDropdown = document.getElementById("popularDropdown");
 const themeButton = document.getElementById("themeButton");
+const randomButton = document.getElementById("randomButton");
 
 /* ==========================================
    UTILITÁRIOS DE ARMAZENAMENTO E SEGURANÇA
@@ -126,6 +127,7 @@ let currentSort = "original";
 let listeningRadio = null;
 let listeningTimer = null;
 let previousVolume = Number(volumeControl.value);
+let lastRandomUrl = null;
 
 let recentRadios = loadFromStorage(STORAGE_KEYS.RECENT, []);
 let popularRadios = loadFromStorage(STORAGE_KEYS.POPULAR, []);
@@ -157,6 +159,47 @@ function loadSavedTheme() {
 themeButton.addEventListener("click", () => {
     const nextIndex = (currentThemeIndex + 1) % THEMES.length;
     applyTheme(nextIndex);
+});
+
+/* ==========================================
+   RÁDIO ALEATÓRIA (DADO 🎲)
+========================================== */
+
+function pickRandomRadio() {
+    if (!radios.length) return null;
+
+    // Se só existe uma rádio, retorna ela mesma
+    if (radios.length === 1) return radios[0];
+
+    let chosen;
+    let attempts = 0;
+
+    // Evita repetir a última sorteada (com limite de tentativas por segurança)
+    do {
+        const index = Math.floor(Math.random() * radios.length);
+        chosen = radios[index];
+        attempts++;
+    } while (chosen.url === lastRandomUrl && attempts < 10);
+
+    lastRandomUrl = chosen.url;
+    return chosen;
+}
+
+randomButton.addEventListener("click", () => {
+    if (!radios.length) {
+        playerStatus.textContent = "Aguarde o carregamento das rádios...";
+        return;
+    }
+
+    // Animação do dado girando
+    randomButton.classList.add("rolling");
+    setTimeout(() => randomButton.classList.remove("rolling"), 600);
+
+    const randomRadio = pickRandomRadio();
+
+    if (randomRadio) {
+        playRadio(randomRadio);
+    }
 });
 
 /* ==========================================
