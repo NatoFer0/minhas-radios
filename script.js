@@ -160,10 +160,9 @@ let listeningTimer = null;
 let previousVolume = Number(volumeControl.value);
 let lastRandomUrl = null;
 
-// Tempo de escuta
-let timeTrackingTimer = null;
-let currentSessionSeconds = 0;
+// Tempo de escuta (baseado em timestamp para resistir ao throttling do navegador)
 let currentTrackingUrl = null;
+let sessionStartTime = null;
 
 let recentRadios = loadFromStorage(STORAGE_KEYS.RECENT, []);
 let popularRadios = loadFromStorage(STORAGE_KEYS.POPULAR, []);
@@ -424,37 +423,34 @@ function registerRadioListen(radio) {
 
 /* ==========================================
    TEMPO DE ESCUTA (⏱️)
+   Baseado em Date.now() para resistir ao throttling de timers
+   em abas em segundo plano (Firefox, Chrome, etc.)
 ========================================== */
 
 function startTimeTracking(radio) {
+    // Se havia uma sessão anterior não salva, salva antes
     stopTimeTracking();
 
     currentTrackingUrl = radio.url;
-    currentSessionSeconds = 0;
-
-    timeTrackingTimer = setInterval(() => {
-        if (
-            currentRadio &&
-            currentRadio.url === currentTrackingUrl &&
-            !audioPlayer.paused
-        ) {
-            currentSessionSeconds += 1;
-        }
-    }, 1000);
+    sessionStartTime = Date.now();
 }
 
 function stopTimeTracking() {
-    if (timeTrackingTimer) {
-        clearInterval(timeTrackingTimer);
-        timeTrackingTimer = null;
+    if (!currentTrackingUrl || sessionStartTime === null) {
+        currentTrackingUrl = null;
+        sessionStartTime = null;
+        return;
     }
 
-    if (currentTrackingUrl && currentSessionSeconds > 0) {
-        saveTimeToStorage(currentTrackingUrl, currentSessionSeconds);
+    const elapsedSeconds = Math.floor((Date.now() - sessionStartTime) / 1000);
+
+    // Só salva se passou pelo menos 1 segundo
+    if (elapsedSeconds > 0) {
+        saveTimeToStorage(currentTrackingUrl, elapsedSeconds);
     }
 
     currentTrackingUrl = null;
-    currentSessionSeconds = 0;
+    sessionStartTime = null;
 }
 
 function saveTimeToStorage(url, seconds) {
@@ -482,9 +478,22 @@ function saveTimeToStorage(url, seconds) {
     renderTimeDropdown();
 }
 
-// Salva o tempo da sessão atual ao fechar a aba
+// Salva o tempo da sessão atual ao fechar/navegar para fora da aba
 window.addEventListener("beforeunload", () => {
     stopTimeTracking();
+});
+
+// Reforço: também salva quando a aba fica oculta (troca de aba, minimizar)
+// É MAIS CONFIÁVEL que o beforeunload em navegadores modernos
+document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden" && currentTrackingUrl) {
+        stopTimeTracking();
+
+        // Se a rádio ainda estiver tocando, reinicia a contagem do zero
+        if (currentRadio && !audioPlayer.paused) {
+            startTimeTracking(currentRadio);
+        }
+    }
 });
 
 /* ==========================================
