@@ -1028,6 +1028,7 @@ body {
         margin-bottom: 10px;
     }
 
+    /* PLAYER MOBILE */
     .player {
         padding: 10px 12px;
     }
@@ -1043,13 +1044,38 @@ body {
         font-size: 19px;
     }
 
+    .player-label {
+        font-size: 9px;
+        letter-spacing: 0.8px;
+    }
+
+    .player-station {
+        font-size: 14px;
+    }
+
+    .player-status {
+        font-size: 10px;
+    }
+
     .play-button {
         width: 44px;
         height: 44px;
     }
 
-    .volume-control {
+    /* Mostra só o botão de MUTE — esconde slider e valor numérico */
+    .volume-control input,
+    .volume-value {
         display: none;
+    }
+
+    .volume-control {
+        gap: 0;
+    }
+
+    #muteButton {
+        width: 34px;
+        height: 34px;
+        font-size: 19px;
     }
 }
 
