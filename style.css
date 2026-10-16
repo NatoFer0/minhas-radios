@@ -275,6 +275,7 @@ body {
 }
 
 .popular-box,
+.time-box,
 .recent-box,
 .sort-box {
     position: relative;
@@ -317,7 +318,7 @@ body {
 }
 
 /* ================================
-   DROPDOWNS (RECENTES E POPULARES)
+   DROPDOWNS (RECENTES, POPULARES E TEMPO)
 ================================ */
 
 .popular-dropdown,
@@ -978,6 +979,7 @@ body {
     }
 
     .popular-box,
+    .time-box,
     .recent-box {
         width: 100%;
     }
