@@ -56,6 +56,7 @@ const CATEGORY_ICONS = {
     "Itália": '<img src="https://flagcdn.io/flags/4x3/it.svg" alt="Italia">',
     "Suiça": '<img src="https://flagcdn.io/flags/4x3/ch.svg" alt="Suica">',
     "Índia": '<img src="https://flagcdn.io/flags/4x3/in.svg" alt="India">',
+    "África do Sul": '<img src="https://flagcdn.io/flags/4x3/za.svg" alt="Africa do Sul">',
     "Disney": "🏰",
     "Outras": "🌎"
 };
