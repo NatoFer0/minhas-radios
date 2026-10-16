@@ -589,31 +589,58 @@ body {
     bottom: 14px;
     width: 38px;
     height: 38px;
+
     display: flex;
     align-items: center;
     justify-content: center;
+
+    padding: 0;
+    margin: 0;
     border: none;
-    outline: none;
     border-radius: 50%;
+    outline: none;
+
     color: white;
     background: var(--accent);
-    cursor: pointer;
     font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+
     box-shadow: 0 5px 15px rgba(124, 92, 255, 0.25);
+
+    /* Reset de aparência nativa (mobile / iOS) */
+    appearance: none;
+    -webkit-appearance: none;
     -webkit-tap-highlight-color: transparent;
-    transition: transform 0.15s, background 0.15s;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+
+    transition: transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
 }
 
+/* Hover (desktop) */
 .radio-play:hover {
     transform: scale(1.08);
     background: var(--accent-light);
 }
 
-.radio-play:focus {
+/* Foco — remove o anel laranja/azul nativo do Chrome/Safari mobile */
+.radio-play:focus,
+.radio-play:focus-visible {
     outline: none;
+    -webkit-focus-ring-color: transparent;
     box-shadow: 0 5px 15px rgba(124, 92, 255, 0.25);
 }
 
+/* Foco apenas via teclado — mantém acessibilidade com anel roxo */
+.radio-play:focus-visible {
+    box-shadow:
+        0 0 0 3px rgba(124, 92, 255, 0.45),
+        0 5px 15px rgba(124, 92, 255, 0.25);
+}
+
+/* Clique / toque */
 .radio-play:active {
     transform: scale(0.95);
 }
