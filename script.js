@@ -10,11 +10,14 @@ const STORAGE_KEYS = {
     RECENT: "minhasRadios_ouvidasRecentemente",
     POPULAR: "minhasRadios_maisEscutadas",
     VOLUME: "minhasRadios_volume",
-    FAVORITES: "minhasRadios_favoritos"
+    FAVORITES: "minhasRadios_favoritos",
+    TIME: "minhasRadios_tempoEscuta"
 };
 
 const LISTEN_TIME_REQUIRED = 5 * 60 * 1000; // 5 minutos
 const MAX_HISTORY_ITEMS = 5;
+const MAX_TIME_ITEMS = 10;
+const TIME_STORAGE_LIMIT = 20;
 
 const THEMES = [
     { name: "original", icon: "◈", label: "Tema Original" },
@@ -81,6 +84,8 @@ const recentButton = document.getElementById("recentButton");
 const recentDropdown = document.getElementById("recentDropdown");
 const popularButton = document.getElementById("popularButton");
 const popularDropdown = document.getElementById("popularDropdown");
+const timeButton = document.getElementById("timeButton");
+const timeDropdown = document.getElementById("timeDropdown");
 const themeButton = document.getElementById("themeButton");
 const randomButton = document.getElementById("randomButton");
 
@@ -117,6 +122,27 @@ function escapeHTML(value) {
 }
 
 /* ==========================================
+   FORMATAÇÃO DE TEMPO
+========================================== */
+
+function formatTime(totalSeconds) {
+    const seconds = Math.floor(totalSeconds);
+
+    if (seconds < 60) {
+        return `${seconds}s`;
+    }
+
+    if (seconds < 3600) {
+        return `${Math.floor(seconds / 60)}min`;
+    }
+
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+
+    return minutes > 0 ? `${hours}h ${minutes}min` : `${hours}h`;
+}
+
+/* ==========================================
    ESTADO DA APLICAÇÃO
 ========================================== */
 
@@ -129,9 +155,15 @@ let listeningTimer = null;
 let previousVolume = Number(volumeControl.value);
 let lastRandomUrl = null;
 
+// Tempo de escuta
+let timeTrackingTimer = null;
+let currentSessionSeconds = 0;
+let currentTrackingUrl = null;
+
 let recentRadios = loadFromStorage(STORAGE_KEYS.RECENT, []);
 let popularRadios = loadFromStorage(STORAGE_KEYS.POPULAR, []);
 let favoriteRadios = loadFromStorage(STORAGE_KEYS.FAVORITES, []);
+let timeRadios = loadFromStorage(STORAGE_KEYS.TIME, []);
 
 /* ==========================================
    GERENCIAMENTO DE TEMAS
@@ -168,13 +200,11 @@ themeButton.addEventListener("click", () => {
 function pickRandomRadio() {
     if (!radios.length) return null;
 
-    // Se só existe uma rádio, retorna ela mesma
     if (radios.length === 1) return radios[0];
 
     let chosen;
     let attempts = 0;
 
-    // Evita repetir a última sorteada (com limite de tentativas por segurança)
     do {
         const index = Math.floor(Math.random() * radios.length);
         chosen = radios[index];
@@ -191,7 +221,6 @@ randomButton.addEventListener("click", () => {
         return;
     }
 
-    // Animação do dado girando
     randomButton.classList.add("rolling");
     setTimeout(() => randomButton.classList.remove("rolling"), 600);
 
@@ -219,6 +248,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     renderRecentDropdown();
     renderPopularDropdown();
+    renderTimeDropdown();
     loadPlaylist();
 });
 
@@ -388,6 +418,71 @@ function registerRadioListen(radio) {
 }
 
 /* ==========================================
+   TEMPO DE ESCUTA (⏱️)
+========================================== */
+
+function startTimeTracking(radio) {
+    stopTimeTracking();
+
+    currentTrackingUrl = radio.url;
+    currentSessionSeconds = 0;
+
+    timeTrackingTimer = setInterval(() => {
+        if (
+            currentRadio &&
+            currentRadio.url === currentTrackingUrl &&
+            !audioPlayer.paused
+        ) {
+            currentSessionSeconds += 1;
+        }
+    }, 1000);
+}
+
+function stopTimeTracking() {
+    if (timeTrackingTimer) {
+        clearInterval(timeTrackingTimer);
+        timeTrackingTimer = null;
+    }
+
+    if (currentTrackingUrl && currentSessionSeconds > 0) {
+        saveTimeToStorage(currentTrackingUrl, currentSessionSeconds);
+    }
+
+    currentTrackingUrl = null;
+    currentSessionSeconds = 0;
+}
+
+function saveTimeToStorage(url, seconds) {
+    const existing = timeRadios.find(item => item.url === url);
+
+    if (existing) {
+        existing.seconds += seconds;
+    } else {
+        const radio = radios.find(r => r.url === url);
+        if (radio) {
+            timeRadios.push({
+                name: radio.name,
+                url: radio.url,
+                seconds: seconds
+            });
+        } else {
+            return;
+        }
+    }
+
+    timeRadios.sort((a, b) => b.seconds - a.seconds);
+    timeRadios = timeRadios.slice(0, TIME_STORAGE_LIMIT);
+
+    saveToStorage(STORAGE_KEYS.TIME, timeRadios);
+    renderTimeDropdown();
+}
+
+// Salva o tempo da sessão atual ao fechar a aba
+window.addEventListener("beforeunload", () => {
+    stopTimeTracking();
+});
+
+/* ==========================================
    RENDERIZAÇÃO DOS DROPDOWNS
 ========================================== */
 
@@ -432,6 +527,48 @@ function renderPopularDropdown() {
         });
 
         popularDropdown.appendChild(item);
+    });
+}
+
+function renderTimeDropdown() {
+    timeDropdown.innerHTML = "";
+
+    if (!timeRadios.length) {
+        timeDropdown.innerHTML = `
+            <div class="recent-empty">
+                Nenhuma rádio com tempo registrado ainda.
+            </div>
+        `;
+        return;
+    }
+
+    timeRadios.slice(0, MAX_TIME_ITEMS).forEach((radio, index) => {
+        const item = document.createElement("button");
+        item.type = "button";
+        item.className = "recent-item";
+        item.title = `Tocar ${radio.name}`;
+
+        item.innerHTML = `
+            <span class="popular-position">${index + 1}º</span>
+            <span class="recent-item-info">
+                <span class="recent-item-name">${escapeHTML(radio.name)}</span>
+                <span class="recent-item-category">${formatTime(radio.seconds)}</span>
+            </span>
+            <span class="recent-item-play">▶</span>
+        `;
+
+        item.addEventListener("click", event => {
+            event.stopPropagation();
+
+            const foundRadio = radios.find(r => r.url === radio.url);
+            if (foundRadio) {
+                playRadio(foundRadio);
+            }
+
+            closeAllDropdowns();
+        });
+
+        timeDropdown.appendChild(item);
     });
 }
 
@@ -623,6 +760,7 @@ function createRadioCard(radio) {
 async function playRadio(radio) {
     try {
         stopListeningCounter();
+        stopTimeTracking();
 
         currentRadio = radio;
         currentStation.textContent = radio.name;
@@ -636,6 +774,7 @@ async function playRadio(radio) {
 
         addToRecent(radio);
         startListeningCounter(radio);
+        startTimeTracking(radio);
 
         playPauseButton.textContent = "⏹";
         playerStatus.innerHTML = LIVE_BADGE_HTML;
@@ -654,6 +793,7 @@ async function playRadio(radio) {
 function stopRadio(statusMessage = "Escolha uma rádio para começar.") {
     audioPlayer.pause();
     stopListeningCounter();
+    stopTimeTracking();
 
     audioPlayer.removeAttribute("src");
     audioPlayer.load();
@@ -686,6 +826,7 @@ playPauseButton.addEventListener("click", async () => {
 
         await audioPlayer.play();
         startListeningCounter(currentRadio);
+        startTimeTracking(currentRadio);
 
         playPauseButton.textContent = "⏹";
         playerStatus.innerHTML = LIVE_BADGE_HTML;
@@ -743,11 +884,11 @@ muteButton.addEventListener("click", () => {
    DROPDOWNS, PESQUISA E ORDENAÇÃO
 ========================================== */
 
-function toggleDropdown(button, dropdown, otherButton, otherDropdown) {
+function toggleDropdown(button, dropdown, otherButtons, otherDropdowns) {
     const isOpen = dropdown.classList.contains("open");
 
-    otherDropdown.classList.remove("open");
-    otherButton.setAttribute("aria-expanded", "false");
+    otherButtons.forEach(btn => btn.setAttribute("aria-expanded", "false"));
+    otherDropdowns.forEach(dd => dd.classList.remove("open"));
 
     if (isOpen) {
         dropdown.classList.remove("open");
@@ -764,20 +905,47 @@ function closeAllDropdowns() {
 
     popularDropdown.classList.remove("open");
     popularButton.setAttribute("aria-expanded", "false");
+
+    timeDropdown.classList.remove("open");
+    timeButton.setAttribute("aria-expanded", "false");
 }
 
 recentButton.addEventListener("click", event => {
     event.stopPropagation();
-    toggleDropdown(recentButton, recentDropdown, popularButton, popularDropdown);
+    toggleDropdown(
+        recentButton,
+        recentDropdown,
+        [popularButton, timeButton],
+        [popularDropdown, timeDropdown]
+    );
 });
 
 popularButton.addEventListener("click", event => {
     event.stopPropagation();
-    toggleDropdown(popularButton, popularDropdown, recentButton, recentDropdown);
+    toggleDropdown(
+        popularButton,
+        popularDropdown,
+        [recentButton, timeButton],
+        [recentDropdown, timeDropdown]
+    );
+});
+
+timeButton.addEventListener("click", event => {
+    event.stopPropagation();
+    toggleDropdown(
+        timeButton,
+        timeDropdown,
+        [recentButton, popularButton],
+        [recentDropdown, popularDropdown]
+    );
 });
 
 document.addEventListener("click", event => {
-    if (!event.target.closest(".recent-box") && !event.target.closest(".popular-box")) {
+    if (
+        !event.target.closest(".recent-box") &&
+        !event.target.closest(".popular-box") &&
+        !event.target.closest(".time-box")
+    ) {
         closeAllDropdowns();
     }
 });
@@ -809,6 +977,7 @@ audioPlayer.addEventListener("waiting", () => {
 
 audioPlayer.addEventListener("error", () => {
     stopListeningCounter();
+    stopTimeTracking();
     playPauseButton.textContent = "▶";
     playerStatus.textContent = "Erro ao acessar o stream.";
     currentRadio = null;
