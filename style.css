@@ -1,4 +1,16 @@
 /* ================================
+   Neutraliza o anel de foco e tap-highlight em TODOS os elementos interativos
+================================ */
+*,
+*:focus,
+*:active {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+}
+
+
+/* ================================
    VARIÁVEIS E TEMAS
 ================================ */
 
@@ -598,7 +610,7 @@ body {
     margin: 0;
     border: none;
     border-radius: 50%;
-    outline: none;
+    outline: none !important;
 
     color: white;
     background: var(--accent);
@@ -608,7 +620,7 @@ body {
 
     box-shadow: 0 5px 15px rgba(124, 92, 255, 0.25);
 
-    /* Reset de aparência nativa (mobile / iOS) */
+    /* Reset completo de aparência nativa */
     appearance: none;
     -webkit-appearance: none;
     -webkit-tap-highlight-color: transparent;
@@ -616,31 +628,22 @@ body {
     -webkit-user-select: none;
     user-select: none;
 
-    transition: transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+    transition: transform 0.15s ease, background 0.15s ease;
 }
 
-/* Hover (desktop) */
 .radio-play:hover {
     transform: scale(1.08);
     background: var(--accent-light);
 }
 
-/* Foco — remove o anel laranja/azul nativo do Chrome/Safari mobile */
-.radio-play:focus,
+/* Foco — anel roxo customizado para acessibilidade */
 .radio-play:focus-visible {
-    outline: none;
-    -webkit-focus-ring-color: transparent;
-    box-shadow: 0 5px 15px rgba(124, 92, 255, 0.25);
-}
-
-/* Foco apenas via teclado — mantém acessibilidade com anel roxo */
-.radio-play:focus-visible {
+    outline: none !important;
     box-shadow:
         0 0 0 3px rgba(124, 92, 255, 0.45),
         0 5px 15px rgba(124, 92, 255, 0.25);
 }
 
-/* Clique / toque */
 .radio-play:active {
     transform: scale(0.95);
 }
