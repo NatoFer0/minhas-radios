@@ -58,6 +58,8 @@ const CATEGORY_ICONS = {
     "Índia": '<img src="https://flagcdn.io/flags/4x3/in.svg" alt="India">',
     "África do Sul": '<img src="https://flagcdn.io/flags/4x3/za.svg" alt="Africa do Sul">',
     "Ucrânia": '<img src="https://flagcdn.io/flags/4x3/ua.svg" alt="Ucrania">',
+    "Bulgária": '<img src="https://flagcdn.io/flags/4x3/bg.svg" alt="Bulgaria">',
+    "Bósnia e Herzegovina": '<img src="https://flagcdn.io/flags/4x3/bg.svg" alt="Bosnia e Herzegovina">',
     "Disney": "🏰",
     "Outras": "🌎"
 };
