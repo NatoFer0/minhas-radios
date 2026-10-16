@@ -15,6 +15,7 @@ const STORAGE_KEYS = {
 };
 
 const LISTEN_TIME_REQUIRED = 5 * 60 * 1000; // 5 minutos
+const LISTEN_CHECK_INTERVAL = 30 * 1000;    // verifica a cada 30s
 const MAX_HISTORY_ITEMS = 5;
 const MAX_TIME_ITEMS = 10;
 const TIME_STORAGE_LIMIT = 20;
@@ -55,11 +56,6 @@ const CATEGORY_ICONS = {
     "Espanha": '<img src="https://flagcdn.io/flags/4x3/es.svg" alt="Espanha">',
     "Itália": '<img src="https://flagcdn.io/flags/4x3/it.svg" alt="Italia">',
     "Suiça": '<img src="https://flagcdn.io/flags/4x3/ch.svg" alt="Suica">',
-    "Índia": '<img src="https://flagcdn.io/flags/4x3/in.svg" alt="India">',
-    "África do Sul": '<img src="https://flagcdn.io/flags/4x3/za.svg" alt="Africa do Sul">',
-    "Ucrânia": '<img src="https://flagcdn.io/flags/4x3/ua.svg" alt="Ucrania">',
-    "Bulgária": '<img src="https://flagcdn.io/flags/4x3/bg.svg" alt="Bulgaria">',
-    "Bósnia e Herzegovina": '<img src="https://flagcdn.io/flags/4x3/ba.svg" alt="Bosnia e Herzegovina">',
     "Disney": "🏰",
     "Outras": "🌎"
 };
@@ -155,12 +151,15 @@ let currentThemeIndex = 0;
 let radios = [];
 let currentRadio = null;
 let currentSort = "original";
-let listeningRadio = null;
-let listeningTimer = null;
 let previousVolume = Number(volumeControl.value);
 let lastRandomUrl = null;
 
-// Tempo de escuta (baseado em timestamp para resistir ao throttling do navegador)
+// 🔥 Mais ouvidas (baseado em timestamp)
+let listeningStartTime = null;
+let listeningRegistered = false;
+let listeningCheckTimer = null;
+
+// ⏱️ Tempo de escuta (baseado em timestamp)
 let currentTrackingUrl = null;
 let sessionStartTime = null;
 
@@ -254,6 +253,9 @@ document.addEventListener("DOMContentLoaded", () => {
     renderPopularDropdown();
     renderTimeDropdown();
     loadPlaylist();
+
+    // Verificação periódica do requisito de 5min (backup para aba sempre visível)
+    listeningCheckTimer = setInterval(checkListeningRequirement, LISTEN_CHECK_INTERVAL);
 });
 
 /* ==========================================
@@ -374,27 +376,37 @@ function addToRecent(radio) {
     renderRecentDropdown();
 }
 
+/* ==========================================
+   🔥 MAIS OUVIDAS
+   Baseado em Date.now() para resistir ao throttling
+========================================== */
+
 function startListeningCounter(radio) {
     stopListeningCounter();
-    listeningRadio = radio;
 
-    listeningTimer = setTimeout(() => {
-        if (
-            currentRadio &&
-            currentRadio.url === radio.url &&
-            !audioPlayer.paused
-        ) {
-            registerRadioListen(radio);
-        }
-    }, LISTEN_TIME_REQUIRED);
+    listeningStartTime = Date.now();
+    listeningRegistered = false;
 }
 
 function stopListeningCounter() {
-    if (listeningTimer) {
-        clearTimeout(listeningTimer);
+    // Antes de zerar, verifica se bateu os 5 min (para não perder a pontuação)
+    checkListeningRequirement();
+
+    listeningStartTime = null;
+    listeningRegistered = false;
+}
+
+function checkListeningRequirement() {
+    if (listeningRegistered) return;
+    if (!currentRadio || audioPlayer.paused) return;
+    if (listeningStartTime === null) return;
+
+    const elapsed = Date.now() - listeningStartTime;
+
+    if (elapsed >= LISTEN_TIME_REQUIRED) {
+        registerRadioListen(currentRadio);
+        listeningRegistered = true;
     }
-    listeningTimer = null;
-    listeningRadio = null;
 }
 
 function registerRadioListen(radio) {
@@ -417,18 +429,14 @@ function registerRadioListen(radio) {
 
     saveToStorage(STORAGE_KEYS.POPULAR, popularRadios);
     renderPopularDropdown();
-
-    listeningTimer = null;
 }
 
 /* ==========================================
-   TEMPO DE ESCUTA (⏱️)
-   Baseado em Date.now() para resistir ao throttling de timers
-   em abas em segundo plano (Firefox, Chrome, etc.)
+   ⏱️ TEMPO DE ESCUTA
+   Baseado em Date.now() para resistir ao throttling
 ========================================== */
 
 function startTimeTracking(radio) {
-    // Se havia uma sessão anterior não salva, salva antes
     stopTimeTracking();
 
     currentTrackingUrl = radio.url;
@@ -444,7 +452,6 @@ function stopTimeTracking() {
 
     const elapsedSeconds = Math.floor((Date.now() - sessionStartTime) / 1000);
 
-    // Só salva se passou pelo menos 1 segundo
     if (elapsedSeconds > 0) {
         saveTimeToStorage(currentTrackingUrl, elapsedSeconds);
     }
@@ -478,21 +485,24 @@ function saveTimeToStorage(url, seconds) {
     renderTimeDropdown();
 }
 
-// Salva o tempo da sessão atual ao fechar/navegar para fora da aba
+// Salva tudo ao fechar/navegar para fora da aba
 window.addEventListener("beforeunload", () => {
+    checkListeningRequirement();
     stopTimeTracking();
 });
 
-// Reforço: também salva quando a aba fica oculta (troca de aba, minimizar)
-// É MAIS CONFIÁVEL que o beforeunload em navegadores modernos
+// Reforço: salva quando a aba fica oculta e revalida ao voltar
 document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === "hidden" && currentTrackingUrl) {
+    if (document.visibilityState === "hidden") {
+        checkListeningRequirement();
         stopTimeTracking();
 
-        // Se a rádio ainda estiver tocando, reinicia a contagem do zero
         if (currentRadio && !audioPlayer.paused) {
             startTimeTracking(currentRadio);
         }
+    } else {
+        // Aba voltou a ficar visível — revalida o requisito de 5min
+        checkListeningRequirement();
     }
 });
 
@@ -656,13 +666,11 @@ function renderRadios(filter = "") {
 
     radioApp.innerHTML = "";
 
-    // Seção de Favoritos
     if (favoriteList.length > 0) {
         const favSection = createCategorySection("Favoritos", "⭐", favoriteList, "favorites-category");
         radioApp.appendChild(favSection);
     }
 
-    // Ordenação das Categorias
     const categoryEntries = Object.entries(categories);
 
     if (currentSort === "az") {
@@ -675,7 +683,6 @@ function renderRadios(filter = "") {
         );
     }
 
-    // Seções de Categorias
     categoryEntries.forEach(([category, categoryRadios]) => {
         const icon = CATEGORY_ICONS[category] || "🌎";
         const section = createCategorySection(escapeHTML(category), icon, categoryRadios);
@@ -990,6 +997,7 @@ audioPlayer.addEventListener("waiting", () => {
 });
 
 audioPlayer.addEventListener("error", () => {
+    checkListeningRequirement();
     stopListeningCounter();
     stopTimeTracking();
     playPauseButton.textContent = "▶";
